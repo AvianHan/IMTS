@@ -20,7 +20,11 @@ cd ~/IMTS
 squeue -u "$USER"
 ```
 
-`--submit` 才会提交。脚本使用两组 Slurm job arrays：CPU 默认最多 4 个作业同时运行，GPU 默认最多 2 个作业同时运行。每个作业只执行一个 dataset/model/seed，互不共享训练状态；一个失败不会使其他 array task 自动失败。Slurm 或账号限制可能让实际并发更低。
+`--submit` 才会提交，默认只提交一小批：**4 个 CPU fits + 2 个 GPU fits**。其余 fits 留在计划中。每个作业仍只执行一个 dataset/model/seed，互不共享训练状态；一个失败不会使其他 array task 自动失败。Slurm 或账号限制可能让实际并发更低。
+
+2026-10-13 的第一次大 array 提交被 `QOSMaxSubmitJobPerUserLimit` 拒绝。`--array=0-139%4` 表示提交 140 个 tasks，最多同时运行 4 个；它仍按 140 个计算提交数量。**提交数量与同时运行数量是两个限制。** 新版本分别使用 `--cpu-batch-size` / `--gpu-batch-size` 控制每批提交量，使用 `--cpu-concurrency` / `--gpu-concurrency` 控制运行并发。
+
+旧回执保留不动。只有回执同时包含非零返回码、空 stdout/job ID，以及明确的 `QOSMaxSubmitJobPerUserLimit` 和 `Batch job submission failed` 错误时，脚本才确认其未提交，不再让它挡住重试。其他未知回执继续阻止重复提交。
 
 | 组别 | 方法 | 每个作业的资源 | 默认时限 | 并发上限 |
 |---|---|---|---|---|
@@ -33,6 +37,7 @@ squeue -u "$USER"
 
 ```bash
 .venv/bin/python scripts/submit_benchmarks.py --submit \
+  --cpu-batch-size 2 --gpu-batch-size 1 \
   --cpu-concurrency 2 --gpu-concurrency 1
 ```
 
@@ -44,6 +49,42 @@ squeue -u "$USER"
 
 JapaneseVowels 此时应剩余 8 个 fits：ROCKET、RIFC、TimesNet、BRITS 各 seed=1,2。
 
+### 自动逐批提交
+
+要依次尝试全部剩余任务，使用：
+
+```bash
+.venv/bin/python -u scripts/submit_benchmarks.py --submit --watch
+```
+
+程序提交一批，默认每 60 秒检查一次；只有本批 CPU/GPU arrays 全部结束并有完整 accounting 记录，才提交下一批。默认该程序最多同时保有 6 个尚未结束的 tasks（CPU 4、GPU 2），不是一次提交全部 246 个。每批等待最慢任务，因此可能暂时有空闲资源；这是本版为简化提交控制采用的安排。
+
+训练失败、超时或被取消的 fit，在同一次 `--watch` 运行中不会自动重试；其他未尝试 fits 继续执行。全部尝试后会报告仍缺成功结果的 fits，不能把“全部尝试结束”理解为“全部成功”。提交被拒绝、提交结果未知或查询失败时会停止；任务离开队列但 accounting 暂不完整时，最多检查 5 次，仍不完整就停止。已经提交的任务不会因此自动取消。
+
+前台运行时需要保持这个进程活着。如果在 Orion 使用后台运行，可用以下命令把输出记录到新的日志文件：
+
+```bash
+mkdir -p results/accounting
+imts_watch_log="results/accounting/batch-watch-$(date +%Y%m%d-%H%M%S).log"
+nohup .venv/bin/python -u scripts/submit_benchmarks.py --submit --watch \
+  > "$imts_watch_log" 2>&1 < /dev/null &
+printf 'Launcher PID: %s\nLog: %s\n' "$!" "$imts_watch_log"
+tail -n 30 "$imts_watch_log"
+```
+
+这是轻量查询和提交进程，training 仍只在 Slurm 分配的 compute nodes 上执行。`nohup` 处理终端断开的 hangup；如果集群有登录节点进程清理策略，仍可能结束该进程。重连后先检查日志和 `squeue`，不要盲目重复启动。脚本持有提交锁，阻止另一个提交进程同时操作。
+
+重新启动新的 `--submit` / `--watch` 命令会重新规划未成功 fits，可能再次尝试上一轮失败的 fits；先看失败日志、调整相应资源。若上一批仍在运行或结果无法核实，脚本会阻止重启提交。
+
+要了解账户的具体额度，可查询（只读）：
+
+```bash
+sacctmgr -P show qos where name=highpriority \
+  format=Name,MaxSubmitJobsPU,MaxJobsPU
+```
+
+默认 6 个 tasks 的选择参考了已成功提交的六个单独 pilot jobs，并不宣称账户上限就是 6。如果同一账号还有其他任务，仍可能碰到共享额度；按真实报错处理，不更换账号或 QoS 来绕过限制。
+
 ## 2. 为什么已有结果能继续用
 
 脚本读取两个现有 JSON 配置，按规定的数据集顺序、方法和 seeds 生成清单。只有 `profile=benchmark` 且 `status=success`、来源和环境检查匹配的记录才算已完成。smoke 和失败记录不计分；重复成功、代码/依赖不一致会报错。
@@ -54,7 +95,7 @@ JapaneseVowels 此时应剩余 8 个 fits：ROCKET、RIFC、TimesNet、BRITS 各
 
 ## 3. 看哪里判断结果
 
-- `squeue -u "$USER"`：看排队和正在执行的 tasks；array 中可能出现 `123456_[0-139%4]` 这样的合并表示。
+- `squeue -u "$USER"`：看排队和正在执行的 tasks；默认 CPU array 中可能出现 `123456_[0-3%4]` 这样的合并表示。
 - `results/accounting/batches/<batch-id>/slurm-<array-id>_<task-index>.out`：每个 array task 有单独日志，`%A` 对应 array job ID，`%a` 对应 task index。
 - `sacct -j <CPU_ARRAY_ID>,<GPU_ARRAY_ID> --format=JobID,State,Elapsed,ExitCode`：看结束状态。每个 task 要结合 `COMPLETED / 0:0` 与其日志末尾的 `status=success` 判断。
 - `results/jv-first-full/benchmark/<dataset>/<MODEL>/seed-<seed>/<run-id>/result.json`：本次分数、fit/predict/total 用时、代码与依赖记录。

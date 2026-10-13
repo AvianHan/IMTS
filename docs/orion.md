@@ -2,6 +2,8 @@
 
 这份文件对应六个 baseline：`rocket`、`borf`、`lgbm`、`rifc`、`timesnet`、`brits`。截至 2026-10-13，六个方法在完整 JapaneseVowels 上的 seed=0 均已在 Orion 成功，见 [首轮结果与用时](jv-first-full.md)。继续其余实验见 [批量运行说明](batch-runs.md)。全部 18 个数据集的完整 benchmark 尚未完成。
 
+批量工具现默认每批只提交 CPU 4 / GPU 2 个 fits，以避免一次大 array 超过 QoS 的提交数量限制；`--submit --watch` 等本批结束后继续下一批。仅 `--submit` 只提交一批。具体更新、后台运行及失败记录处理见上述批量运行说明。
+
 ## 1. 在 login node 准备环境
 
 进入服务器上的仓库目录。下面假设仓库在 `~/IMTS`，路径不同就替换这一行。

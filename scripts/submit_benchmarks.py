@@ -25,6 +25,7 @@ import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
 GPU_MODELS = {"TIMESNET", "BRITS"}
+MAX_ACCOUNTING_POLLS = 5
 TERMINAL = {"COMPLETED", "FAILED", "CANCELLED", "TIMEOUT", "NODE_FAIL",
             "OUT_OF_MEMORY", "PREEMPTED", "BOOT_FAIL", "DEADLINE", "REVOKED"}
 INVENTORY_CODE = """
@@ -48,6 +49,10 @@ with (cache / ('.imts-download-' + spec['file'] + '.lock')).open('a') as lock:
     fcntl.flock(lock, fcntl.LOCK_EX)
     repository.download_dataset_from_huggingface(spec['file'])
 """
+
+
+class AccountingPending(RuntimeError):
+    """An array left the queue, but complete accounting is not visible yet."""
 
 
 def read_json(path):
@@ -93,6 +98,44 @@ def inventory(python):
 
 def task_key(task):
     return task["dataset"], task["model"], task["seed"]
+
+
+def select_batch(tasks, args):
+    """Limit submitted tasks, independently of the arrays' running limits."""
+    limits = {group: getattr(args, f"{group}_batch_size", default)
+              for group, default in (("cpu", 4), ("gpu", 2))}
+    if any(not isinstance(value, int) or isinstance(value, bool) or value < 1
+           for value in limits.values()):
+        raise ValueError("Batch sizes must be positive integers")
+    counts = {"cpu": 0, "gpu": 0}
+    selected = []
+    for task in tasks:
+        group = "gpu" if task["device"] == "cuda" else "cpu"
+        if counts[group] < limits[group]:
+            selected.append(task)
+            counts[group] += 1
+    return selected
+
+
+def known_submit_rejection(receipt):
+    """Recognize only the observed, unequivocal QoS submit-limit refusal.
+
+    Older launchers saved this response as ``unconfirmed``. Its immutable
+    receipt can be interpreted safely without changing or deleting the record.
+    A timeout, malformed success response, or any job ID remains uncertain.
+    """
+    code = receipt.get("returncode")
+    if (not isinstance(code, (int, float)) or isinstance(code, bool)
+            or not math.isfinite(code) or code == 0
+            or receipt.get("status") == "submitted"):
+        return False
+    if any(not isinstance(receipt.get(name), str) or receipt[name].strip()
+           for name in ("stdout", "job_id")):
+        return False
+    error = receipt.get("stderr")
+    return (isinstance(error, str)
+            and re.search(r"^sbatch: error: QOSMaxSubmitJobPerUserLimit\s*$", error, re.M) is not None
+            and re.search(r"^sbatch: error: Batch job submission failed: .+$", error, re.M) is not None)
 
 
 @contextlib.contextmanager
@@ -163,8 +206,8 @@ def array_is_terminal(job_id, task_count):
     states = {row[0].strip(): row[1].split()[0].rstrip("+") for row in rows if len(row) >= 2}
     expected = {f"{job_id}_{index}" for index in range(task_count)}
     if not expected <= states.keys():
-        raise RuntimeError(f"Job {job_id} lacks complete per-task accounting evidence; "
-                           "refusing duplicate submission. Check its receipt and Slurm manually.")
+        raise AccountingPending(f"Job {job_id} lacks complete per-task accounting evidence; "
+                                "refusing duplicate submission. Check its receipt and Slurm manually.")
     return all(states[key] in TERMINAL for key in expected)
 
 
@@ -188,6 +231,8 @@ def check_previous_batches(ledger, output, pending):
                 raise RuntimeError(f"Submission outcome is unknown: {intent}. "
                                    "Inspect Slurm using the recorded job name before any retry.")
             saved = read_json(receipt)
+            if known_submit_rejection(saved):
+                continue  # A recorded refusal did not create a Slurm array.
             if saved["status"] != "submitted":
                 raise RuntimeError(f"Unconfirmed submission: {receipt}. Inspect Slurm before retrying.")
             if not array_is_terminal(saved["job_id"], len(tasks)):
@@ -205,6 +250,9 @@ def template_text(root, group):
 
 
 def submit(args, root, output, ledger, tasks, source, env, datasets, revision, skipped):
+    tasks = select_batch(tasks, args)
+    if not tasks:
+        raise ValueError("Cannot submit an empty batch")
     batch_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:8]
     folder = ledger / batch_id
     folder.mkdir(parents=True)
@@ -233,6 +281,7 @@ def submit(args, root, output, ledger, tasks, source, env, datasets, revision, s
     manifest_path = folder / "manifest.json"
     write_new(manifest_path, manifest)
     manifest_hash = digest(manifest_path)
+    submitted = []
     for group, group_tasks in groups.items():
         if not group_tasks:
             continue
@@ -259,13 +308,102 @@ def submit(args, root, output, ledger, tasks, source, env, datasets, revision, s
         receipt = {"status": "submitted" if confirmed else "unconfirmed", "job_id": job_id,
                    "returncode": result.returncode, "stdout": result.stdout, "stderr": result.stderr,
                    "manifest_sha256": manifest_hash}
+        rejected = known_submit_rejection(receipt)
+        if rejected:
+            receipt["status"] = "rejected"
         write_new(folder / f"{group}.receipt.json", receipt)
         if not confirmed:
-            raise RuntimeError(f"sbatch outcome requires review: {folder / (group + '.receipt.json')}. "
-                               "Earlier submitted arrays remain active; no automatic retry was made.")
+            outcome = "was rejected by Slurm" if rejected else "has an unconfirmed outcome"
+            earlier = (f"Earlier confirmed arrays: {', '.join(job for job, _ in submitted)}. "
+                       "They were not cancelled; check their current state before another submission."
+                       if submitted else "No earlier array was confirmed in this batch.")
+            raise RuntimeError(f"{group.upper()} submission {outcome}. "
+                               f"Receipt: {folder / (group + '.receipt.json')}\n"
+                               f"Slurm stderr: {result.stderr.strip() or '(empty)'}\n"
+                               f"{earlier} No automatic retry was made.")
+        submitted.append((job_id, len(group_tasks)))
         print(f"Submitted {group.upper()} array {job_id}: {len(group_tasks)} tasks, "
               f"at most {getattr(args, group + '_concurrency')} running", flush=True)
-    print(f"Manifest and receipts: {folder}")
+    print(f"Manifest and receipts: {folder}", flush=True)
+    return folder, submitted
+
+
+def wait_for_arrays(jobs, poll_seconds):
+    """Wait for arrays, tolerating brief accounting lag but never query errors."""
+    waiting = list(jobs)
+    accounting_polls = {}
+    while waiting:
+        next_waiting = []
+        for job, count in waiting:
+            try:
+                terminal = array_is_terminal(job, count)
+                accounting_polls.pop(job, None)
+            except AccountingPending as exc:
+                accounting_polls[job] = accounting_polls.get(job, 0) + 1
+                if accounting_polls[job] >= MAX_ACCOUNTING_POLLS:
+                    raise AccountingPending(f"Job {job} still lacks complete accounting after "
+                                            f"{MAX_ACCOUNTING_POLLS} polls; --watch stopped. "
+                                            "Check its receipt and Slurm before another submission.") from exc
+                terminal = False
+                print(f"Waiting for accounting for array {job} "
+                      f"({accounting_polls[job]}/{MAX_ACCOUNTING_POLLS} checks)", flush=True)
+            if not terminal:
+                next_waiting.append((job, count))
+        waiting = next_waiting
+        if not waiting:
+            break
+        print(f"Waiting for arrays: {', '.join(job for job, _ in waiting)}; "
+              f"checking again in {poll_seconds} seconds", flush=True)
+        remaining_delay = poll_seconds
+        while remaining_delay > 0:
+            delay = min(remaining_delay, 60)
+            time.sleep(delay)
+            remaining_delay -= delay
+
+
+def run_batches(args, root, output, ledger, tasks, source, env, datasets,
+                revision, skipped, pending):
+    """Submit one bounded batch, or watch sequential batches until attempted.
+
+    The caller holds the submission lock throughout. Failed training is never
+    retried within this invocation; fresh invocations may explicitly retry it.
+    """
+    if not args.watch:
+        submit(args, root, output, ledger, pending, source, env, datasets, revision, skipped)
+        return 0
+    attempted = set()
+    wave = 0
+    while True:
+        if source_digest(root) != source:
+            raise RuntimeError("src/configs changed during --watch; stopped before the next batch. "
+                               "Restore the recorded version before continuing this experiment.")
+        if inventory(root / ".venv/bin/python") != env:
+            raise RuntimeError("Python/package inventory changed during --watch; "
+                               "stopped before the next batch.")
+        skipped, running = successful_tasks(output, tasks, source, env, revision)
+        pending = [task for task in tasks if task_key(task) not in skipped
+                   and task_key(task) not in attempted]
+        if not pending:
+            unsuccessful = attempted - skipped.keys()
+            print(f"Watch finished: {len(skipped)}/{len(tasks)} compatible successes; "
+                  f"{len(unsuccessful)} attempted tasks without a compatible success.", flush=True)
+            if unsuccessful:
+                print("These tasks were not retried; inspect their logs before a new submission:", flush=True)
+                for dataset, model, seed in sorted(unsuccessful):
+                    print(f"  {dataset} / {model} / seed {seed}", flush=True)
+            return 1 if unsuccessful else 0
+        finished_keys = check_previous_batches(ledger, output, pending)
+        unmanaged = ({task_key(task) for task in pending} & running.keys()) - finished_keys
+        if unmanaged:
+            raise RuntimeError(f"Unresolved running records: {[running[key] for key in sorted(unmanaged)]}. "
+                               "Check their jobs before resubmitting; --watch stopped safely.")
+        batch = select_batch(pending, args)
+        wave += 1
+        print(f"Wave {wave}: submitting {len(batch)} tasks; "
+              f"{len(pending) - len(batch)} still deferred", flush=True)
+        _, jobs = submit(args, root, output, ledger, batch, source, env, datasets, revision, skipped)
+        attempted.update(task_key(task) for task in batch)
+        wait_for_arrays(jobs, args.poll_seconds)
 
 
 def worker(args):
@@ -321,6 +459,13 @@ def positive_int(value):
     return number
 
 
+def poll_interval(value):
+    number = int(value)
+    if number < 30:
+        raise argparse.ArgumentTypeError("must be at least 30 seconds")
+    return number
+
+
 def time_limit(value):
     if not re.fullmatch(r"(?:[0-9]+-)?[0-9]{1,3}:[0-5][0-9]:[0-5][0-9]", value):
         raise argparse.ArgumentTypeError("use HH:MM:SS or D-HH:MM:SS")
@@ -332,10 +477,18 @@ def time_limit(value):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--submit", action="store_true", help="actually submit; default is a read-only dry run")
+    parser.add_argument("--watch", action="store_true",
+                        help="with --submit, wait for each bounded batch then submit the next; keep this process running")
+    parser.add_argument("--poll-seconds", type=poll_interval, default=60,
+                        help="Slurm polling interval in watch mode (minimum 30; default 60)")
     parser.add_argument("--datasets", nargs="+", help="optional configured dataset names")
     parser.add_argument("--output-root", default="results/jv-first-full")
     parser.add_argument("--cpu-concurrency", type=positive_int, default=4)
     parser.add_argument("--gpu-concurrency", type=positive_int, default=2)
+    parser.add_argument("--cpu-batch-size", type=positive_int, default=4,
+                        help="maximum CPU tasks submitted per wave (default 4)")
+    parser.add_argument("--gpu-batch-size", type=positive_int, default=2,
+                        help="maximum GPU tasks submitted per wave (default 2)")
     parser.add_argument("--cpu-time", type=time_limit, default="02:00:00")
     parser.add_argument("--gpu-time", type=time_limit, default="01:00:00")
     parser.add_argument("--max-dense-gib", type=float, default=8.0)
@@ -345,6 +498,8 @@ def main():
     args = parser.parse_args()
     if args.worker:
         return worker(args)
+    if args.watch and not args.submit:
+        parser.error("--watch requires --submit")
     if not math.isfinite(args.max_dense_gib) or args.max_dense_gib <= 0:
         parser.error("--max-dense-gib must be finite and positive")
     root = ROOT
@@ -373,18 +528,24 @@ def main():
                                "Check their jobs before resubmitting; no automatic retry was made.")
         counts = {group: sum((task["device"] == "cuda") == (group == "gpu") for task in pending)
                   for group in ("cpu", "gpu")}
-        print(f"Datasets: {len(chosen)} | Planned fits: {len(tasks)} | Compatible successes: {len(skipped)}")
-        print(f"Remaining: {len(pending)} = CPU {counts['cpu']} + GPU {counts['gpu']}")
+        batch = select_batch(pending, args)
+        batch_counts = {group: sum((task["device"] == "cuda") == (group == "gpu") for task in batch)
+                        for group in ("cpu", "gpu")}
+        print(f"Datasets: {len(chosen)} | Planned fits: {len(tasks)} | Compatible successes: {len(skipped)}", flush=True)
+        print(f"Remaining: {len(pending)} = CPU {counts['cpu']} + GPU {counts['gpu']}", flush=True)
+        print(f"Next batch: {len(batch)} = CPU {batch_counts['cpu']} + GPU {batch_counts['gpu']}", flush=True)
+        print(f"Deferred: {len(pending) - len(batch)}", flush=True)
         print(f"Concurrency: CPU {args.cpu_concurrency}, GPU {args.gpu_concurrency}; "
-              f"time limits: {args.cpu_time}, {args.gpu_time}; dense-load guard: {args.max_dense_gib:g} GiB")
-        print(f"Results: {output}")
+              f"time limits: {args.cpu_time}, {args.gpu_time}; dense-load guard: {args.max_dense_gib:g} GiB", flush=True)
+        print(f"Results: {output}", flush=True)
         if not pending:
-            print("All selected tasks already succeeded. No jobs submitted.")
+            print("All selected tasks already succeeded. No jobs submitted.", flush=True)
         elif not args.submit:
-            print("DRY RUN: no jobs submitted. Add --submit to submit the listed remaining tasks.")
+            print("DRY RUN: no jobs submitted. Add --submit for the next batch only, "
+                  "or --submit --watch to continue through deferred tasks.", flush=True)
         else:
-            submit(args, root, output, ledger, pending, source, env, datasets,
-                   data_config["data_revision"], skipped)
+            return run_batches(args, root, output, ledger, tasks, source, env, datasets,
+                               data_config["data_revision"], skipped, pending)
     return 0
 
 

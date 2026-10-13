@@ -30,3 +30,11 @@ sktime 对含NaN的 pipeline 给出 capability warning；本项目保留官方�
 新增 `tests/test_batch_submission.py` 使用临时结果目录和模拟 Slurm 回应，验证 252→246（CPU 140 / GPU 106）的跳过逻辑、dry-run 不提交也不写文件、来源/环境不匹配与重复成功拒绝、活跃/未知提交阻止重试、完整 array accounting 核实、部分提交保留回执、生成脚本的 `bash -n` 检查、worker 代码变更检查和任务锁。
 
 这部分是离线提交逻辑测试，不代表已经在 Orion 执行新的 arrays，也不产生新的 benchmark 分数。模型和数据加载代码没有因批量提交而改变。
+
+### QoS 提交数量修复（2026-10-13）
+
+Orion 的实际回执显示 `QOSMaxSubmitJobPerUserLimit`：140 个 CPU array tasks 即使带 `%4` 仍超过提交数量限制。本次调整 launcher，每批默认只提交 CPU 4 / GPU 2；新增可选 `--watch` 自动依次处理其余 fits。
+
+`.venv/bin/python -m pytest tests/test_batch_submission.py -q`：**35 passed**。验证严格识别旧 QoS 拒绝回执且不改写、其他不明确回执仍阻止重复提交、246 个剩余 fits 中仅下一批 6 个进入 arrays、watch 多批不重复失败 fit、部分提交保留回执、accounting 短暂延迟等待及持续不完整时停止。所有 Slurm 回应均为模拟，没有实际提交训练。
+
+`src/`、`configs/`、Slurm 资源模板和 hyperparameters 均未修改。已有六次成功结果仍按原兼容性检查复用；新提交行为尚待 Orion 实际验证。
