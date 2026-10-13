@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=imts-cpu
 #SBATCH --account=prj0000000262
-#SBATCH --partition=cpun
+#SBATCH --partition=cpup
+#SBATCH --qos=highpriority
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
@@ -10,7 +11,7 @@
 #SBATCH --output=slurm-%j.out
 
 set -euo pipefail
-# Confirm account access and partition limits before submitting.
+# This account's cpup/highpriority request passed Orion --test-only validation.
 if [[ ! -x .venv/bin/python ]]; then
   echo "Missing .venv/bin/python; check sbatch --chdir and bootstrap.sh" >&2
   exit 1

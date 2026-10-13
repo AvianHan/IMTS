@@ -2,7 +2,7 @@
 
 验证日期：2026-10-13。环境：Linux / Python 3.12 / PyTorch 2.6.0+cpu。
 
-**这是代码与短流程验证，不是完整 benchmark 复现成绩。** 尚未在 Orion、CUDA/H200 或全部18个数据集上运行。
+**这是代码与短流程验证，不是完整 benchmark 复现成绩。** 下文记录本地验证；Orion CUDA/H200 上的 TimesNet、BRITS smoke 已通过，当前集群进展见 `docs/orion.md`。全部 18 个数据集的完整 benchmark 尚未完成。
 
 ## 结果
 

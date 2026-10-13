@@ -1,18 +1,19 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=imts-gpu
 #SBATCH --account=prj0000000262
-#SBATCH --partition=h200n
+#SBATCH --partition=h200p
+#SBATCH --qos=highpriority
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --gres=gpu:1
 #SBATCH --mem=32G
-#SBATCH --time=1-00:00:00
+#SBATCH --time=01:00:00
 #SBATCH --output=slurm-%j.out
 
 set -euo pipefail
-# Full benchmarks use the regular GPU partition, not the testing queue.
-# Confirm account eligibility and current limits before submitting.
+# This account's h200p/highpriority request passed Orion --test-only validation.
+# The one-hour limit is an initial budget; adjust it using measured full runs.
 if [[ ! -x .venv/bin/python ]]; then
   echo "Missing .venv/bin/python; check sbatch --chdir and bootstrap.sh" >&2
   exit 1

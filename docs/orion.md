@@ -1,6 +1,6 @@
 # Orion：从环境检查到第一次完整运行
 
-这份文件对应六个 baseline：`rocket`、`borf`、`lgbm`、`rifc`、`timesnet`、`brits`。脚本在本地做语法检查；**尚未在 Orion 提交，也没有 Orion 实验结果**。
+这份文件对应六个 baseline：`rocket`、`borf`、`lgbm`、`rifc`、`timesnet`、`brits`。截至 2026-10-13，TimesNet 和 BRITS 的 JapaneseVowels GPU smoke 已在 Orion H200 上成功；正式 CPU/GPU 提交配置已通过 `sbatch --test-only`，**完整训练尚未执行**。
 
 ## 1. 在 login node 准备环境
 
@@ -47,20 +47,35 @@ PyTorch 固定为 `2.6.0`。`nvidia-smi` 显示的 CUDA 数字表示驱动能力
 
 `synthetic` 是代码内生成的小样本，用来检查代码流程，不是论文数据集。先让 synthetic smoke 通过，再用 JapaneseVowels 检查真实输入。
 
-## 3. 核实 Slurm 分区和 account
+## 3. 核实 Slurm 分区、account 和 QoS
 
 以下是只读检查：
 
 ```bash
 sinfo
+sacctmgr -P show assoc where user="$USER" format=Cluster,Account,User,Partition,QOS,DefaultQOS
 scontrol show partition testqueue
-scontrol show partition cpun
-scontrol show partition h200n
+scontrol show partition cpup
+scontrol show partition h200p
 ```
 
-脚本使用已经提供的 account `prj0000000262`。`testqueue` 仅用于测试，按已提供信息最多 18 小时；完整 CPU run 使用 `cpun`，完整 GPU run 使用正式分区 `h200n`。已观察到 `h200n` 时限为 3 天，模板先申请 1 天。**这些分区对当前 account 的实际使用权限尚未在 Orion 提交验证**；以学校指南、当前配置和提交结果为准。
+当前用户 `hansy` 的 account `prj0000000262` 允许的 QoS 为 `highpriority`，默认 QoS 为空。`cpun` 和 `h200n` 只接受 `normal`，与当前权限不匹配，曾导致六次提交都返回 `Invalid qos specification`；这些任务没有实际运行。
 
-若 account 或 partition 不同，优先在提交命令上覆盖，例如 `sbatch --account=实际账户 --partition=实际分区 ...`。不要在未分配资源的 login node 上做 training。
+正式模板因此使用 **CPU：`cpup`；GPU：`h200p`；两者均为 `--qos=highpriority`**。以下配置已通过 Orion 的提交预检查：
+
+```bash
+sbatch --test-only --chdir="$PWD" \
+  --account=prj0000000262 --partition=cpup --qos=highpriority \
+  --time=02:00:00 slurm/benchmark_cpu.sbatch
+
+sbatch --test-only --chdir="$PWD" \
+  --account=prj0000000262 --partition=h200p --qos=highpriority \
+  --time=01:00:00 slurm/benchmark_gpu.sbatch
+```
+
+`--test-only` 检查提交配置，不会真正提交或运行任务；其输出中的编号不表示已启动训练。`testqueue` 仍仅用于 smoke 测试。
+
+其他用户或 account 应重新核实权限；可在提交命令上覆盖 `--account`、`--partition` 和 `--qos`。不要在未分配资源的 login node 上做 training。
 
 ## 4. 提交一个 smoke job
 
@@ -96,6 +111,8 @@ sacct -j 123456 --format=JobID,State,Elapsed,ExitCode
 
 `PENDING` 表示排队，`RUNNING` 表示已开始，`COMPLETED` 且 `ExitCode=0:0` 表示 job 正常退出。还应检查输出结果文件；smoke 分数只用于验证流程，不能作为 baseline 成绩。
 
+已验证的 JapaneseVowels GPU smoke：TimesNet job `160482`、修复后的 BRITS job `160572`，两者均为 `COMPLETED`、`0:0`，日志末尾为 `"status": "success"`。它们只训练 1 个 epoch，不能替代完整训练结果。
+
 ## 5. 提交单个完整 run
 
 CPU 方法示例：
@@ -120,7 +137,7 @@ IMTS_MODEL=brits IMTS_DATASET=JapaneseVowels IMTS_SEED=0 \
 | `IMTS_OUTPUT_DIR` | 结果目录 | `results`；smoke 用 `results/smoke` |
 | `IMTS_MAX_DENSE_GIB` | 数据转为 dense array 时的容量上限 | `8` GiB |
 
-CPU 模板申请 2 小时，GPU 模板申请 1 天；**申请时限不是预估运行时间**。超时会被 Slurm 结束，应根据第一次实际耗时和分区限制调整。完整 run 使用正式分区，smoke 使用 `testqueue`。先完成一个 dataset/model/seed，检查结果，再批量运行。
+CPU 模板申请 2 小时，GPU 模板先申请 1 小时；**申请时限不是预估运行时间**。超时会被 Slurm 结束，应根据第一次实际耗时和分区限制调整。完整 run 使用正式分区，smoke 使用 `testqueue`。先完成一个 dataset/model/seed，检查结果，再批量运行。
 
 Slurm 模板把实际申请的 CPU core 数传给 CLI 的全局 `--threads` 参数，默认 4。`IMTS_MAX_DENSE_GIB` 限制数据转为 dense array 时的容量；它不代表整个 job 的内存上限，也不会替代 Slurm 的 `--mem` 请求。
 
