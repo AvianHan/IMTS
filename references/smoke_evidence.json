@@ -1,0 +1,266 @@
+[
+  {
+    "run_id": "20261013T054024Z-b02915f6",
+    "dataset": "JapaneseVowels",
+    "model": "BORF",
+    "profile": "smoke",
+    "status": "success",
+    "seed": 0,
+    "shapes": {
+      "train": [
+        64,
+        12,
+        29
+      ],
+      "test": [
+        32,
+        12,
+        29
+      ]
+    },
+    "fit_seconds": 6.084587640998507,
+    "predict_seconds": 0.05465897099929862
+  },
+  {
+    "run_id": "20261013T054044Z-26b4c459",
+    "dataset": "JapaneseVowels",
+    "model": "BRITS",
+    "profile": "smoke",
+    "status": "success",
+    "seed": 0,
+    "shapes": {
+      "train": [
+        64,
+        12,
+        29
+      ],
+      "test": [
+        32,
+        12,
+        29
+      ]
+    },
+    "fit_seconds": 0.28119524700014153,
+    "predict_seconds": 0.06330852500104811
+  },
+  {
+    "run_id": "20261013T054032Z-f77631e1",
+    "dataset": "JapaneseVowels",
+    "model": "LGBM",
+    "profile": "smoke",
+    "status": "success",
+    "seed": 0,
+    "shapes": {
+      "train": [
+        64,
+        12,
+        29
+      ],
+      "test": [
+        32,
+        12,
+        29
+      ]
+    },
+    "fit_seconds": 0.33759080700110644,
+    "predict_seconds": 0.0526982470000803
+  },
+  {
+    "run_id": "20261013T054035Z-12927757",
+    "dataset": "JapaneseVowels",
+    "model": "RIFC",
+    "profile": "smoke",
+    "status": "success",
+    "seed": 0,
+    "shapes": {
+      "train": [
+        64,
+        12,
+        29
+      ],
+      "test": [
+        32,
+        12,
+        29
+      ]
+    },
+    "fit_seconds": 1.3748380090000865,
+    "predict_seconds": 0.5202709519999189
+  },
+  {
+    "run_id": "20261013T054004Z-5e8da8c6",
+    "dataset": "JapaneseVowels",
+    "model": "ROCKET",
+    "profile": "smoke",
+    "status": "success",
+    "seed": 0,
+    "shapes": {
+      "train": [
+        64,
+        12,
+        29
+      ],
+      "test": [
+        32,
+        12,
+        29
+      ]
+    },
+    "fit_seconds": 1.0675590929986356,
+    "predict_seconds": 0.02467703000002075
+  },
+  {
+    "run_id": "20261013T054038Z-e5bd2bd1",
+    "dataset": "JapaneseVowels",
+    "model": "TIMESNET",
+    "profile": "smoke",
+    "status": "success",
+    "seed": 0,
+    "shapes": {
+      "train": [
+        64,
+        12,
+        29
+      ],
+      "test": [
+        32,
+        12,
+        29
+      ]
+    },
+    "fit_seconds": 0.38652420899961726,
+    "predict_seconds": 0.07841181899857474
+  },
+  {
+    "run_id": "20261013T053759Z-4029338e",
+    "dataset": "synthetic",
+    "model": "BORF",
+    "profile": "smoke",
+    "status": "success",
+    "seed": 0,
+    "shapes": {
+      "train": [
+        40,
+        3,
+        32
+      ],
+      "test": [
+        16,
+        3,
+        32
+      ]
+    },
+    "fit_seconds": 34.41393065400007,
+    "predict_seconds": 0.020133808999162284
+  },
+  {
+    "run_id": "20261013T053844Z-672bdb66",
+    "dataset": "synthetic",
+    "model": "BRITS",
+    "profile": "smoke",
+    "status": "success",
+    "seed": 0,
+    "shapes": {
+      "train": [
+        40,
+        3,
+        32
+      ],
+      "test": [
+        16,
+        3,
+        32
+      ]
+    },
+    "fit_seconds": 0.2099002360009763,
+    "predict_seconds": 0.04491540500021074
+  },
+  {
+    "run_id": "20261013T053836Z-f303ba26",
+    "dataset": "synthetic",
+    "model": "LGBM",
+    "profile": "smoke",
+    "status": "success",
+    "seed": 0,
+    "shapes": {
+      "train": [
+        40,
+        3,
+        32
+      ],
+      "test": [
+        16,
+        3,
+        32
+      ]
+    },
+    "fit_seconds": 0.11943542900007742,
+    "predict_seconds": 0.013087726998492144
+  },
+  {
+    "run_id": "20261013T053837Z-71a5d174",
+    "dataset": "synthetic",
+    "model": "RIFC",
+    "profile": "smoke",
+    "status": "success",
+    "seed": 0,
+    "shapes": {
+      "train": [
+        40,
+        3,
+        32
+      ],
+      "test": [
+        16,
+        3,
+        32
+      ]
+    },
+    "fit_seconds": 0.36940720199891075,
+    "predict_seconds": 0.09135018699998909
+  },
+  {
+    "run_id": "20261013T053701Z-0498671c",
+    "dataset": "synthetic",
+    "model": "ROCKET",
+    "profile": "smoke",
+    "status": "success",
+    "seed": 0,
+    "shapes": {
+      "train": [
+        40,
+        3,
+        32
+      ],
+      "test": [
+        16,
+        3,
+        32
+      ]
+    },
+    "fit_seconds": 56.30688587500117,
+    "predict_seconds": 0.010641638000379317
+  },
+  {
+    "run_id": "20261013T053839Z-2dcde76a",
+    "dataset": "synthetic",
+    "model": "TIMESNET",
+    "profile": "smoke",
+    "status": "success",
+    "seed": 0,
+    "shapes": {
+      "train": [
+        40,
+        3,
+        32
+      ],
+      "test": [
+        16,
+        3,
+        32
+      ]
+    },
+    "fit_seconds": 0.241707534998568,
+    "predict_seconds": 0.04493782899953658
+  }
+]

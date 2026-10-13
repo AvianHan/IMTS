@@ -1,0 +1,16 @@
+# Tested reconstruction environment; NOT the authors' historical lockfile.
+numpy==1.26.4
+pandas==2.2.3
+scipy==1.14.1
+scikit-learn==1.5.2
+numba==0.61.2
+sktime==0.39.0
+aeon==1.2.0
+lightgbm==4.6.0
+xarray==2024.11.0
+pyarrow==18.1.0
+h5py==3.12.1
+sparse==0.17.0
+PyYAML==6.0.2
+pytest==8.3.5
+pyrregular @ git+https://github.com/fspinna/pyrregular.git@94644559dbe0d92bc0a10105c8d2ce300b700c97

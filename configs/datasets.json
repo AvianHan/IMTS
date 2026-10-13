@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "source": "https://github.com/fspinna/pyrregular",
+  "data_revision": "f416b1b432f248a73323222f2378d0e8433ca6d2",
+  "split_policy": "Use official default task: fit on split != test (train/val/validation); evaluate only split == test. Do not resplit.",
+  "order": "Pyrregular paper table order, multivariate datasets only",
+  "datasets": [
+    {
+      "name": "Mimic3",
+      "channels": 17,
+      "file": "Mimic3.h5",
+      "sha256": "2050a6b459af5c6eb0f4211e26b3a0ec525451d59dac6fc12ad52b1770714953"
+    },
+    {
+      "name": "Physionet2012",
+      "channels": 37,
+      "file": "Physionet2012.h5",
+      "sha256": "3a236e007c0a296eac610c671d308b72a97aeed6865c7f7407537fb8f824107f"
+    },
+    {
+      "name": "Physionet2019",
+      "channels": 34,
+      "file": "Physionet2019.h5",
+      "sha256": "57210ee1da9c2ee6cca3f4bf183f5209e35035d55c3c62cc678f53c180e6f923"
+    },
+    {
+      "name": "CharacterTrajectories",
+      "channels": 3,
+      "file": "CharacterTrajectories.h5",
+      "sha256": "02aa866760f9a5f3defbea1af8bf55c0768136b564841666c87e77c455fbc94a"
+    },
+    {
+      "name": "Ldfpa",
+      "channels": 12,
+      "file": "Ldfpa.h5",
+      "sha256": "876fa3295ae08004de41b11d95a060d104a9966bd7ec90de1029398c03f583cc"
+    },
+    {
+      "name": "Pamap2",
+      "channels": 52,
+      "file": "Pamap2.h5",
+      "sha256": "ea28c7682d51e9f43ce673d5b15375cff111e295f7370fcf315dd51be15cad27"
+    },
+    {
+      "name": "Animals",
+      "channels": 2,
+      "file": "Animals.h5",
+      "sha256": "e63a8068c896e8f8305c4c9a72bacac8a5783d1957e07c12b2288912f2576e37"
+    },
+    {
+      "name": "AsphaltObstaclesCoordinates",
+      "channels": 3,
+      "file": "AsphaltObstaclesCoordinates.h5",
+      "sha256": "54fbaeafca78d4ddb0808f8fcd9707279e464bcf6ccf0b9eae87c7e49c7d7514"
+    },
+    {
+      "name": "AsphaltPavementTypeCoordinates",
+      "channels": 3,
+      "file": "AsphaltPavementTypeCoordinates.h5",
+      "sha256": "87f43b0aec7e688eaeae9895ec871d9b6d888564246942294a30fe26892fde1a"
+    },
+    {
+      "name": "AsphaltRegularityCoordinates",
+      "channels": 3,
+      "file": "AsphaltRegularityCoordinates.h5",
+      "sha256": "140864e520c47b08e0b630baf025b19597804a14ffe2069e8d5700537415f999"
+    },
+    {
+      "name": "GeolifeSupervised",
+      "channels": 2,
+      "file": "GeolifeSupervised.h5",
+      "sha256": "eb11b2fbfc61d4aedfc027cac3e03887328e6163c7cb0cace8afdfcb331de3b8"
+    },
+    {
+      "name": "Seabirds",
+      "channels": 4,
+      "file": "Seabirds.h5",
+      "sha256": "6b9d9f82cf205c73efcb88b4164a2437c9503032c463f8b7a6fa0f12dc831348"
+    },
+    {
+      "name": "Taxi",
+      "channels": 2,
+      "file": "Taxi.h5",
+      "sha256": "21463a6c138a0ea45558849ba872784fed6d770c2cb941b920408c31e31d330a"
+    },
+    {
+      "name": "Vehicles",
+      "channels": 2,
+      "file": "Vehicles.h5",
+      "sha256": "d14c8f61784ed0a75d87fed31b60ef58e83f9f7b77155a242e576145ce225e5f"
+    },
+    {
+      "name": "InsectWingbeat",
+      "channels": 200,
+      "file": "InsectWingbeat.h5",
+      "sha256": "6f677dbfa53092271714eb8adb45ab2d05140e5e47ad88524b9aca58d9f2e768"
+    },
+    {
+      "name": "JapaneseVowels",
+      "channels": 12,
+      "file": "JapaneseVowels.h5",
+      "sha256": "20f1909acb5bba1b680f7ef32f1ea3990ef5d7b9dc54fd1357a23e09c8e3ed06"
+    },
+    {
+      "name": "Garment",
+      "channels": 9,
+      "file": "Garment.h5",
+      "sha256": "bb6dbe6a37691db23a2b2bb70bce1d341e4c84d905a98ed34513fea7a8cef5ca"
+    },
+    {
+      "name": "SpokenArabicDigits",
+      "channels": 13,
+      "file": "SpokenArabicDigits.h5",
+      "sha256": "24535cddd385addfcd187957ef552ef2f570eab2316e3d5c60ede199c3b02167"
+    }
+  ]
+}

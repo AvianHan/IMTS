@@ -218,3 +218,10 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Experiment artifacts stay outside Git; keep only documented verification summaries.
+results/
+datasets/
+slurm-*.out
+experiment-plan.csv
+benchmark-summary.csv

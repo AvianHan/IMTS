@@ -1,0 +1,14 @@
+{
+  "upstream_revision": "94644559dbe0d92bc0a10105c8d2ce300b700c97",
+  "data_revision": "f416b1b432f248a73323222f2378d0e8433ca6d2",
+  "primary_metric": "macro_f1",
+  "seed_provenance": "Our declared seeds; original experiment seeds were not published in the inspected sources.",
+  "models": {
+    "ROCKET": {"seeds": [0, 1, 2]},
+    "BORF": {"seeds": [0]},
+    "LGBM": {"seeds": [0]},
+    "RIFC": {"seeds": [0, 1, 2]},
+    "TIMESNET": {"seeds": [0, 1, 2]},
+    "BRITS": {"seeds": [0, 1, 2]}
+  }
+}

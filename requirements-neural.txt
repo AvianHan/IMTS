@@ -1,0 +1,4 @@
+# Install the CPU or CUDA build of torch==2.6.0 FIRST; see bootstrap.sh.
+-r requirements.txt
+torch==2.6.0
+pypots==1.5
