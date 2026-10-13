@@ -1,6 +1,6 @@
 # Orion：从环境检查到第一次完整运行
 
-这份文件对应六个 baseline：`rocket`、`borf`、`lgbm`、`rifc`、`timesnet`、`brits`。截至 2026-10-13，TimesNet 和 BRITS 的 JapaneseVowels GPU smoke 已在 Orion H200 上成功；正式 CPU/GPU 提交配置已通过 `sbatch --test-only`，**完整训练尚未执行**。
+这份文件对应六个 baseline：`rocket`、`borf`、`lgbm`、`rifc`、`timesnet`、`brits`。截至 2026-10-13，六个方法在完整 JapaneseVowels 上的 seed=0 均已在 Orion 成功，见 [首轮结果与用时](jv-first-full.md)。继续其余实验见 [批量运行说明](batch-runs.md)。全部 18 个数据集的完整 benchmark 尚未完成。
 
 ## 1. 在 login node 准备环境
 
