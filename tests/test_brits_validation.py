@@ -9,6 +9,37 @@ pytest.importorskip("pypots")
 
 from imts_benchmark.compat import BRITSHoldoutValidation, check_brits_compatibility
 from imts_benchmark.models import build_model, model_settings
+from imts_benchmark import compat
+
+
+def test_fingerprint_survives_python_token_number_changes(monkeypatch):
+    """Python 3.10/3.11 use OP=54, while Python 3.12 uses OP=55."""
+    original_tokens = compat.tokenize.generate_tokens
+    op = compat.tokenize.OP
+    alternate_op = 10000
+
+    def renumbered_tokens(readline):
+        for token in original_tokens(readline):
+            yield token._replace(type=alternate_op) if token.type == op else token
+
+    monkeypatch.setitem(compat.tokenize.tok_name, alternate_op, "OP")
+    monkeypatch.setattr(compat.tokenize, "generate_tokens", renumbered_tokens)
+    check_brits_compatibility()
+
+
+def test_actual_upstream_code_change_is_still_rejected(monkeypatch):
+    source = compat.inspect.getsource(compat.UpstreamBRITS.fit)
+    changed_source = source.replace("shuffle=True", "shuffle=False", 1)
+    assert changed_source != source
+    monkeypatch.setattr(compat.inspect, "getsource", lambda _: changed_source)
+    with pytest.raises(RuntimeError, match="differs from the audited implementation"):
+        check_brits_compatibility()
+
+
+def test_fingerprint_ignores_comments_and_blank_lines(monkeypatch):
+    source = compat.inspect.getsource(compat.UpstreamBRITS.fit)
+    monkeypatch.setattr(compat.inspect, "getsource", lambda _: "# added comment\n\n" + source)
+    check_brits_compatibility()
 
 
 def _capture_fit_without_training():

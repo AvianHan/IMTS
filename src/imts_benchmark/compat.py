@@ -57,7 +57,7 @@ from torch.utils.data import DataLoader
 
 
 _EXPECTED_VERSION = "1.5"
-_EXPECTED_FIT_SHA256 = "3dc078f4499a2934adba8def61d6d1e3b4107f068ca655bd775698730fc5b525"
+_EXPECTED_FIT_SHA256 = "1c4da2f00481758aaf707478004229c74e63523f27bcf2c34c2df1bb058667e9"
 
 
 def _fit_fingerprint() -> str:
@@ -72,7 +72,9 @@ def _fit_fingerprint() -> str:
         tokenize.ENDMARKER,
     }
     tokens = [
-        (token.type, token.string)
+        # Numeric token IDs change between Python releases (OP: 54 -> 55).
+        # Names remain stable for the tokens in this audited fit method.
+        (tokenize.tok_name[token.type], token.string)
         for token in tokenize.generate_tokens(io.StringIO(source).readline)
         if token.type not in ignored
     ]
@@ -88,9 +90,11 @@ def check_brits_compatibility() -> None:
             "The BRITS validation correction requires audited pypots==1.5; "
             f"found {installed_version}. Re-audit before changing the pin."
         )
-    if _fit_fingerprint() != _EXPECTED_FIT_SHA256:
+    actual_fingerprint = _fit_fingerprint()
+    if actual_fingerprint != _EXPECTED_FIT_SHA256:
         raise RuntimeError(
             "PyPOTS BRITS.fit differs from the audited implementation. "
+            f"Expected {_EXPECTED_FIT_SHA256}, found {actual_fingerprint}. "
             "Re-audit its validation loading before applying this correction."
         )
 
@@ -102,6 +106,7 @@ class BRITSHoldoutValidation(UpstreamBRITS):
         "brits_heldout_validation_fix": True,
         "pypots_version": _EXPECTED_VERSION,
         "upstream_fit_sha256": _EXPECTED_FIT_SHA256,
+        "upstream_fit_fingerprint_format": "token-names-v1",
         "change": "validation DatasetForBRITS(train_set) -> DatasetForBRITS(val_set)",
     }
 

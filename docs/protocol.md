@@ -27,6 +27,8 @@ PyPOTS 1.5 `classification/brits/model.py:BRITS.fit` 在 `if val_set is not None
 
 `compat.BRITSHoldoutValidation` 复制官方 fit，唯一行为改动是上述参数改为 `val_set`；保存 BSD attribution。版本与原 fit token hash 必须匹配，否则明确报错而非自动套用补丁。测试捕获真实 DataLoader 的内容，验证 train/validation 没混用。结果记录 compatibility flag。
 
+源码指纹使用 token 名称和文本（`token-names-v1`），忽略空白与注释，已核对 Python 3.10、3.11、3.12 一致。初版误用 token 数字编号，在 Python 3.10/3.11 上会因 `OP=54`（3.12 为 `55`）误报；修复没有关闭源码检查，也没有改变模型或 validation 修正。
+
 这是为保证 held-out validation 正确而做的公开差异，不能声称历史作者一定采用或一定没采用同一 bug。测试分数也不证明已复现论文。
 
 ## 评估
