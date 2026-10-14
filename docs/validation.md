@@ -38,3 +38,15 @@ Orion 的实际回执显示 `QOSMaxSubmitJobPerUserLimit`：140 个 CPU array ta
 `.venv/bin/python -m pytest tests/test_batch_submission.py -q`：**35 passed**。验证严格识别旧 QoS 拒绝回执且不改写、其他不明确回执仍阻止重复提交、246 个剩余 fits 中仅下一批 6 个进入 arrays、watch 多批不重复失败 fit、部分提交保留回执、accounting 短暂延迟等待及持续不完整时停止。所有 Slurm 回应均为模拟，没有实际提交训练。
 
 `src/`、`configs/`、Slurm 资源模板和 hyperparameters 均未修改。已有六次成功结果仍按原兼容性检查复用；新提交行为尚待 Orion 实际验证。
+
+## 独立方法分支与额度升级（2026-10-13）
+
+本节记录之后在 `feature/our-method` 独立 worktree 中的验证。新增 `src/imts_agents`，原 baseline 的 `src/imts_benchmark` 与模型配置保持一致。
+
+- 完整测试：`.venv/bin/python -m pytest -q`，**174 passed in 5.94s**。
+- 覆盖数据切分与训练集拟合、显式 NaN 与无记录的区分、未来 patch 隔离、状态重置、通信/选路干预、policy 梯度、COMMIT、checkpoint 与一次性 test guard。
+- 配额和提交测试覆盖 56 合计波次、全用户 60 上限、共享锁、模糊回执保护，以及跨 checkout wrapper 使用原 baseline 的源码、环境和结果路径。Slurm 回应为模拟。
+- 四组核心实验与八组消融均已完成 JapaneseVowels seed 0 的完整本地 validation pilot，详见 [实际结果](method-pilot-results.md)。没有评估官方 test，没有提交 Orion 作业。
+- 方法与 baseline 使用独立环境；已核对各自 editable import 指向各自 checkout。
+
+旧 baseline watcher 的停止、提高后续提交量以及 Orion CUDA 验证仍需按 [并行运行手册](method-orion.md) 在服务器执行。本地验证不能替代集群调度、CUDA 或其他数据形态验证。

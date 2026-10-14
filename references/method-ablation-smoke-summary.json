@@ -1,0 +1,2364 @@
+{
+  "scope": "30 one-epoch CPU smoke runs; not official benchmark scores; no test evaluation",
+  "source_sha256": [
+    "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777"
+  ],
+  "datasets": [
+    "JapaneseVowels",
+    "CharacterTrajectories",
+    "Physionet2012"
+  ],
+  "n_runs": 30,
+  "all_success": true,
+  "all_validation_checks_pass": true,
+  "subsequent_changes": "Explicit garbage collection after releasing the xarray accessor cycle, plus report-only failed/running attempt counting. Model and runner unchanged. Final Physionet2012 smoke is recorded separately.",
+  "runs": [
+    {
+      "dataset": "CharacterTrajectories",
+      "variant": "history_both",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 0,
+        "total": 52948,
+        "trainable": 52948
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 3.1294969800001127,
+      "config_sha256": "763a0752d3f07efefac8f025d13e65f272f0bfed65911a11b36c1a5b1d8b193e",
+      "checkpoint_sha256": "1097474338633bda4fa80dc0907ec7819e974fbcd6f36b8d35831a3bb7058a64",
+      "diagnostics_sha256": "3034551946324251e299e92ca7f7988869fc9e8dc32755c4acb896ff506f8854",
+      "comparison_protocol_sha256": "9cf95978e31279af2c06f924fb3c09e117069f5c940cc99b09fa813093e44b3e",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/CharacterTrajectories/history_both/seed-0/20261014T134120Z-012197a2/result.json",
+      "result_sha256": "e0067b5534518eb68548901aefec7442fc1525dd45a2f1a3af17c84589ed3f0a",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "population_std": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          6372,
+          6372,
+          6372
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 0.35025468099956925,
+        "distribution": [
+          {
+            "actions": [
+              "T",
+              "S",
+              "ST"
+            ],
+            "count": 2124,
+            "fraction": 1.0
+          }
+        ],
+        "empty_patches": 724,
+        "nonempty_patches": 2124,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 1
+      }
+    },
+    {
+      "dataset": "CharacterTrajectories",
+      "variant": "history_reread",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 0,
+        "total": 52948,
+        "trainable": 52948
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 3.1337630540001555,
+      "config_sha256": "148f270ad72b11ab4199ddd5fb229f0111bac4b4b2caa528d1b6cd941e1ce620",
+      "checkpoint_sha256": "8502000e355903193116125d723ad6c652a349ba72163697d108388c0599b315",
+      "diagnostics_sha256": "cc088e1599874af7697525d9a334538602e109eac01293e72acaf37fb72273ac",
+      "comparison_protocol_sha256": "9cf95978e31279af2c06f924fb3c09e117069f5c940cc99b09fa813093e44b3e",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/CharacterTrajectories/history_reread/seed-0/20261014T134120Z-73c64a03/result.json",
+      "result_sha256": "32ad467a0f3ba7d3c522115feb2e056556e3f676e6d0ad069a027a8b4bb8f115",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "population_std": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          6372,
+          6372,
+          6372
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 0.3891295720004564,
+        "distribution": [
+          {
+            "actions": [
+              "T",
+              "S",
+              "ST"
+            ],
+            "count": 2124,
+            "fraction": 1.0
+          }
+        ],
+        "empty_patches": 724,
+        "nonempty_patches": 2124,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 1
+      }
+    },
+    {
+      "dataset": "CharacterTrajectories",
+      "variant": "history_state",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 0,
+        "total": 52948,
+        "trainable": 52948
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 3.6949596689992177,
+      "config_sha256": "00dba78d744173be00a60ebd934fdf519f1edf18943c03dd034cc0d4513c74e6",
+      "checkpoint_sha256": "bd3c2f771caa39637d45ac8f0c0ce9c303e56caf80450a96f1e118c38147c5e0",
+      "diagnostics_sha256": "ab287bbbf3cc11ba6fca4398e473dcdbb580b270c18ae3b893aa8ac64291428c",
+      "comparison_protocol_sha256": "9cf95978e31279af2c06f924fb3c09e117069f5c940cc99b09fa813093e44b3e",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/CharacterTrajectories/history_state/seed-0/20261014T134128Z-701873e0/result.json",
+      "result_sha256": "64e85ab97ca75601adab2236576b4eaa2f0f14b4df24ff2e19939ddabac0a868",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "population_std": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          6372,
+          6372,
+          6372
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 0.3364502309996169,
+        "distribution": [
+          {
+            "actions": [
+              "T",
+              "S",
+              "ST"
+            ],
+            "count": 2124,
+            "fraction": 1.0
+          }
+        ],
+        "empty_patches": 724,
+        "nonempty_patches": 2124,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 1
+      }
+    },
+    {
+      "dataset": "CharacterTrajectories",
+      "variant": "interaction_centralized",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 31140,
+        "total": 84088,
+        "trainable": 84088
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 8.678361755000878,
+      "config_sha256": "cfd224e9787c309ba0cf24c1870b92c2f480f38d4bba03c398cb288d138873f3",
+      "checkpoint_sha256": "92bb98f839d549d06cee088a866be0861cdfda721f85b80d658b1af28df7860d",
+      "diagnostics_sha256": "f653254d7371b05eb52165885dc8f4103622a2c5124da83d304575894cae1770",
+      "comparison_protocol_sha256": "9cf95978e31279af2c06f924fb3c09e117069f5c940cc99b09fa813093e44b3e",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/CharacterTrajectories/interaction_centralized/seed-0/20261014T134145Z-01eb9284/result.json",
+      "result_sha256": "d05a5f3ce6406f41e34b6a7de5884b368f0da89df1ba7dbb846e4224fc9b4a9b",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "population_std": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          6372,
+          6372,
+          6372
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 0.8546126780001941,
+        "distribution": [
+          {
+            "actions": [
+              "T",
+              "T",
+              "S"
+            ],
+            "count": 916,
+            "fraction": 0.4312617702448211
+          },
+          {
+            "actions": [
+              "T",
+              "T",
+              "ST"
+            ],
+            "count": 492,
+            "fraction": 0.23163841807909605
+          },
+          {
+            "actions": [
+              "T",
+              "S",
+              "S"
+            ],
+            "count": 406,
+            "fraction": 0.1911487758945386
+          },
+          {
+            "actions": [
+              "ST",
+              "S",
+              "ST"
+            ],
+            "count": 85,
+            "fraction": 0.04001883239171375
+          },
+          {
+            "actions": [
+              "ST",
+              "T",
+              "ST"
+            ],
+            "count": 59,
+            "fraction": 0.027777777777777776
+          },
+          {
+            "actions": [
+              "S",
+              "S",
+              "S"
+            ],
+            "count": 48,
+            "fraction": 0.022598870056497175
+          },
+          {
+            "actions": [
+              "S",
+              "S",
+              "ST"
+            ],
+            "count": 42,
+            "fraction": 0.01977401129943503
+          },
+          {
+            "actions": [
+              "T",
+              "S",
+              "ST"
+            ],
+            "count": 39,
+            "fraction": 0.018361581920903956
+          },
+          {
+            "actions": [
+              "ST",
+              "S",
+              "S"
+            ],
+            "count": 20,
+            "fraction": 0.009416195856873822
+          },
+          {
+            "actions": [
+              "ST",
+              "T",
+              "S"
+            ],
+            "count": 17,
+            "fraction": 0.00800376647834275
+          }
+        ],
+        "empty_patches": 724,
+        "nonempty_patches": 2124,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 10
+      }
+    },
+    {
+      "dataset": "CharacterTrajectories",
+      "variant": "interaction_dynamic",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 9804,
+        "total": 62752,
+        "trainable": 62752
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 8.40839866799979,
+      "config_sha256": "7d42f12f417b888392254c232512f3782b390b31fb3d6d2aecc5f89d18b97e9a",
+      "checkpoint_sha256": "e1ecce72f71ab854f1a0a54ef0673f5f04fd4735431e1c7129e75c765097043d",
+      "diagnostics_sha256": "f73d99feebc091550fbe73716f0fc196192ceb7224b3eb8949c6fa02d46cb3b0",
+      "comparison_protocol_sha256": "9cf95978e31279af2c06f924fb3c09e117069f5c940cc99b09fa813093e44b3e",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/CharacterTrajectories/interaction_dynamic/seed-0/20261014T134141Z-e143bce6/result.json",
+      "result_sha256": "3d67788551bb9c5bea14b29540780d9169521a5f501d55271db856fc461afa1d",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "population_std": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          6372,
+          6372,
+          6372
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 0.5257463710004231,
+        "distribution": [
+          {
+            "actions": [
+              "ST",
+              "ST",
+              "T"
+            ],
+            "count": 1332,
+            "fraction": 0.6271186440677966
+          },
+          {
+            "actions": [
+              "T",
+              "ST",
+              "T"
+            ],
+            "count": 373,
+            "fraction": 0.1756120527306968
+          },
+          {
+            "actions": [
+              "S",
+              "S",
+              "S"
+            ],
+            "count": 349,
+            "fraction": 0.1643126177024482
+          },
+          {
+            "actions": [
+              "T",
+              "T",
+              "T"
+            ],
+            "count": 63,
+            "fraction": 0.029661016949152543
+          },
+          {
+            "actions": [
+              "ST",
+              "S",
+              "S"
+            ],
+            "count": 6,
+            "fraction": 0.002824858757062147
+          },
+          {
+            "actions": [
+              "S",
+              "S",
+              "T"
+            ],
+            "count": 1,
+            "fraction": 0.00047080979284369113
+          }
+        ],
+        "empty_patches": 724,
+        "nonempty_patches": 2124,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 6
+      }
+    },
+    {
+      "dataset": "CharacterTrajectories",
+      "variant": "interaction_no_commit",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 9804,
+        "total": 62752,
+        "trainable": 62752
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 8.92606270000033,
+      "config_sha256": "cab5820cb0cde4493178e5153a013b31aa1eeaa6febab0414b734dce10ed1498",
+      "checkpoint_sha256": "dfb3a29d54bd6416b953eb3cb122980a48037215ba93664ab2d385a6fd0dbe41",
+      "diagnostics_sha256": "0c0288baf40a9d496de7d484625478715d9eaf064f239616036b285447e86e4e",
+      "comparison_protocol_sha256": "9cf95978e31279af2c06f924fb3c09e117069f5c940cc99b09fa813093e44b3e",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/CharacterTrajectories/interaction_no_commit/seed-0/20261014T134145Z-6b1ce90b/result.json",
+      "result_sha256": "908ba62f27997895194c9c30e2a3477ced797ce4684d9f0f1363b2962b8e4c6e",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "population_std": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          6372,
+          6372,
+          6372
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 0.8154490480010281,
+        "distribution": [
+          {
+            "actions": [
+              "ST",
+              "T",
+              "T"
+            ],
+            "count": 934,
+            "fraction": 0.4397363465160075
+          },
+          {
+            "actions": [
+              "T",
+              "T",
+              "T"
+            ],
+            "count": 726,
+            "fraction": 0.3418079096045198
+          },
+          {
+            "actions": [
+              "S",
+              "ST",
+              "S"
+            ],
+            "count": 355,
+            "fraction": 0.16713747645951035
+          },
+          {
+            "actions": [
+              "ST",
+              "ST",
+              "T"
+            ],
+            "count": 108,
+            "fraction": 0.05084745762711865
+          },
+          {
+            "actions": [
+              "S",
+              "T",
+              "T"
+            ],
+            "count": 1,
+            "fraction": 0.00047080979284369113
+          }
+        ],
+        "empty_patches": 724,
+        "nonempty_patches": 2124,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 5
+      }
+    },
+    {
+      "dataset": "CharacterTrajectories",
+      "variant": "interaction_no_communication",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 0,
+        "total": 52948,
+        "trainable": 52948
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 2.6193695700003445,
+      "config_sha256": "53bf4f7e2ecc73228a93502a374d8fab25c99b49df37a48c6f10e926e9789e28",
+      "checkpoint_sha256": "f06288dba1d23569e6854923c0c907cb24f9328d849ae39d9bf82a33a91276b6",
+      "diagnostics_sha256": "b45a67338d720b7468b509e85293b302947710bfd336997925952065aa671102",
+      "comparison_protocol_sha256": "9cf95978e31279af2c06f924fb3c09e117069f5c940cc99b09fa813093e44b3e",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/CharacterTrajectories/interaction_no_communication/seed-0/20261014T134133Z-cc64b545/result.json",
+      "result_sha256": "6554b9b6b4ab1b0cb71eefa6911aabbb7511e1479415b64fb96134aff1d0018d",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "population_std": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          6372,
+          6372,
+          6372
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 0.34934021399931225,
+        "distribution": [
+          {
+            "actions": [
+              "T",
+              "S",
+              "ST"
+            ],
+            "count": 2124,
+            "fraction": 1.0
+          }
+        ],
+        "empty_patches": 724,
+        "nonempty_patches": 2124,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 1
+      }
+    },
+    {
+      "dataset": "CharacterTrajectories",
+      "variant": "interaction_preplanned",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 9804,
+        "total": 62752,
+        "trainable": 62752
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 7.603073962000053,
+      "config_sha256": "a6ff8809584f7542eeba76135b7e561df43e7b43e510991cea2f44c58ff3df1d",
+      "checkpoint_sha256": "2a94d7cc1d1141fa1ed70f8dddb3ba5a4fe9b0e67902b5375bb9734cef646b6d",
+      "diagnostics_sha256": "09f92f536e74603950679a976abd0f9b754e9331b880f771916cdf184ce45f02",
+      "comparison_protocol_sha256": "9cf95978e31279af2c06f924fb3c09e117069f5c940cc99b09fa813093e44b3e",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/CharacterTrajectories/interaction_preplanned/seed-0/20261014T134141Z-11fe25b4/result.json",
+      "result_sha256": "2ff872801480a5a8e06b22d8daba07ad1bf2427732a2442d98ff8190dfb1d539",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "population_std": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          6372,
+          6372,
+          6372
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 0.47771474799992575,
+        "distribution": [
+          {
+            "actions": [
+              "ST",
+              "ST",
+              "T"
+            ],
+            "count": 899,
+            "fraction": 0.4232580037664783
+          },
+          {
+            "actions": [
+              "T",
+              "ST",
+              "T"
+            ],
+            "count": 715,
+            "fraction": 0.3366290018832392
+          },
+          {
+            "actions": [
+              "S",
+              "S",
+              "T"
+            ],
+            "count": 321,
+            "fraction": 0.15112994350282485
+          },
+          {
+            "actions": [
+              "T",
+              "T",
+              "T"
+            ],
+            "count": 154,
+            "fraction": 0.07250470809792843
+          },
+          {
+            "actions": [
+              "S",
+              "S",
+              "S"
+            ],
+            "count": 35,
+            "fraction": 0.01647834274952919
+          }
+        ],
+        "empty_patches": 724,
+        "nonempty_patches": 2124,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 5
+      }
+    },
+    {
+      "dataset": "CharacterTrajectories",
+      "variant": "write_content",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 0,
+        "total": 56181,
+        "trainable": 56181
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 3.345717075999346,
+      "config_sha256": "90f4c0c1081d356b7a4677266a3a1d0780a13ea548c323df98c5901bb2d59c9a",
+      "checkpoint_sha256": "044891e1a9c7d2d7e6039561bba394d8013571926a66b68237f367235ff9a761",
+      "diagnostics_sha256": "298d292e3982a2827168ee8e94217910b254ff7b854e17df4f678465e5e56e34",
+      "comparison_protocol_sha256": "9cf95978e31279af2c06f924fb3c09e117069f5c940cc99b09fa813093e44b3e",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/CharacterTrajectories/write_content/seed-0/20261014T134132Z-6f1f1b9d/result.json",
+      "result_sha256": "ad130924208975a6d8aed857543499264a26fcb91208eecf6fba2b3d70d1956d",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          0.4633826799386713,
+          0.6381318932124376,
+          0.5677704187735625
+        ],
+        "population_std": [
+          0.07915482870996297,
+          0.07407639018898568,
+          0.08214871208943013
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          6372,
+          6372,
+          6372
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 0.426068168000711,
+        "distribution": [
+          {
+            "actions": [
+              "T",
+              "S",
+              "ST"
+            ],
+            "count": 2124,
+            "fraction": 1.0
+          }
+        ],
+        "empty_patches": 724,
+        "nonempty_patches": 2124,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 1
+      }
+    },
+    {
+      "dataset": "CharacterTrajectories",
+      "variant": "write_static",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 0,
+        "total": 52951,
+        "trainable": 52951
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 3.7239028320000216,
+      "config_sha256": "bcc84a5c05ac42efc74dc7ded3309f5d681db1b15b7290d85839534c9a312b78",
+      "checkpoint_sha256": "e62c23f69c7b2971029e53b3d948e1b718a252951c5dd8caad28c86c0cf709f4",
+      "diagnostics_sha256": "4288edaaa6faf4e2c0b4e293af9f44ee2e9f385bfe4751cef51b9290350b3a3b",
+      "comparison_protocol_sha256": "9cf95978e31279af2c06f924fb3c09e117069f5c940cc99b09fa813093e44b3e",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/CharacterTrajectories/write_static/seed-0/20261014T134128Z-41358bbf/result.json",
+      "result_sha256": "41541090215222a2d287de96989924ecaf709dce9017bd0a6768d1277d9eef06",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          0.4997422433243708,
+          0.5005382434871312,
+          0.5015248719506943
+        ],
+        "population_std": [
+          0.0001266004893446218,
+          0.0002396772184961021,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          6372,
+          6372,
+          6372
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 0.4237789740000153,
+        "distribution": [
+          {
+            "actions": [
+              "T",
+              "S",
+              "ST"
+            ],
+            "count": 2124,
+            "fraction": 1.0
+          }
+        ],
+        "empty_patches": 724,
+        "nonempty_patches": 2124,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 1
+      }
+    },
+    {
+      "dataset": "JapaneseVowels",
+      "variant": "history_both",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 0,
+        "total": 52873,
+        "trainable": 52873
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 0.8536938859997463,
+      "config_sha256": "10e6e9eee823d29a7f156f40eaf537a80a957958ddd82bb1926ac9f54e7e6ff1",
+      "checkpoint_sha256": "efeeba264222182b863c7f72a7995a09a772e40a88d9a029842fa52b12b13e0c",
+      "diagnostics_sha256": "604bff2856028170e5803c497d0729aec7ad20ca386d11c38ac0afd8b13a1e18",
+      "comparison_protocol_sha256": "bf3a4e4bdcd6f9a7a3b360e18aa6b3d1bed3e96c2ea37d25790fe9cc94c8429c",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/JapaneseVowels/history_both/seed-0/20261014T134103Z-197618af/result.json",
+      "result_sha256": "b10375dae4bab1631acaaa9e16660742e376e85ce45db5f2171204f189785e91",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "population_std": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          4692,
+          4692,
+          4692
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 0.12610253400089277,
+        "distribution": [
+          {
+            "actions": [
+              "T",
+              "S",
+              "ST"
+            ],
+            "count": 391,
+            "fraction": 1.0
+          }
+        ],
+        "empty_patches": 153,
+        "nonempty_patches": 391,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 1
+      }
+    },
+    {
+      "dataset": "JapaneseVowels",
+      "variant": "history_reread",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 0,
+        "total": 52873,
+        "trainable": 52873
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 0.860103404000256,
+      "config_sha256": "617e7bde388f1ed9e0635c3768adec61907366bae29cd457f3112bd3d82c5cfc",
+      "checkpoint_sha256": "8a2548ed8cdb6d84c21d75fb583d8fb0503bb5d28b64e0a590fecfbfdf8fb89e",
+      "diagnostics_sha256": "b642aee161e09538d502659569a9d40d8c57f0005ef47eaf385b19afa430c0d4",
+      "comparison_protocol_sha256": "bf3a4e4bdcd6f9a7a3b360e18aa6b3d1bed3e96c2ea37d25790fe9cc94c8429c",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/JapaneseVowels/history_reread/seed-0/20261014T134103Z-4e689c19/result.json",
+      "result_sha256": "55b02974a72104336788e75acc55b0cddd08cb6e08faa887ae44d076e150e118",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "population_std": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          4692,
+          4692,
+          4692
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 0.10706609499902697,
+        "distribution": [
+          {
+            "actions": [
+              "T",
+              "S",
+              "ST"
+            ],
+            "count": 391,
+            "fraction": 1.0
+          }
+        ],
+        "empty_patches": 153,
+        "nonempty_patches": 391,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 1
+      }
+    },
+    {
+      "dataset": "JapaneseVowels",
+      "variant": "history_state",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 0,
+        "total": 52873,
+        "trainable": 52873
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 0.7730520269997214,
+      "config_sha256": "00bb99cead27d2ce6b5547b8e07f794fb6edae4f308bff2d7eb5a46b2e18a338",
+      "checkpoint_sha256": "6edbb597a87681e983b7a0a651cd475e78effe36ec9bfed3c27e4cc3ba3f1a6d",
+      "diagnostics_sha256": "93e5e154afa9566f8045fe00b23fba2bff2f32ee47eff77fddb8ca64355b0a34",
+      "comparison_protocol_sha256": "bf3a4e4bdcd6f9a7a3b360e18aa6b3d1bed3e96c2ea37d25790fe9cc94c8429c",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/JapaneseVowels/history_state/seed-0/20261014T134104Z-ffa63759/result.json",
+      "result_sha256": "63c6b1c10af78b837353676a517641fa7071347ada0669e7e38458b938baef6b",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "population_std": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          4692,
+          4692,
+          4692
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 0.120491839999886,
+        "distribution": [
+          {
+            "actions": [
+              "T",
+              "S",
+              "ST"
+            ],
+            "count": 391,
+            "fraction": 1.0
+          }
+        ],
+        "empty_patches": 153,
+        "nonempty_patches": 391,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 1
+      }
+    },
+    {
+      "dataset": "JapaneseVowels",
+      "variant": "interaction_centralized",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 31140,
+        "total": 84013,
+        "trainable": 84013
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 2.2810645459994703,
+      "config_sha256": "74512825dad05c762d8ed9936b5255af4815ed719075e6816266657fd0e8bb3d",
+      "checkpoint_sha256": "0f40d8819bbc50d3c5876b77bea595f3b0f9003fb94c84e4377fe25ac733c198",
+      "diagnostics_sha256": "65e2f298a3e09d273e4a0130c73b87bcc292489b5d1252739fa1ee3a1825b031",
+      "comparison_protocol_sha256": "bf3a4e4bdcd6f9a7a3b360e18aa6b3d1bed3e96c2ea37d25790fe9cc94c8429c",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/JapaneseVowels/interaction_centralized/seed-0/20261014T134118Z-4d7ec52a/result.json",
+      "result_sha256": "050c0655caad7d5759575c09f89ae19a8b6cb93486d524137367ca668366ce70",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "population_std": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          4692,
+          4692,
+          4692
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 0.21956210200005444,
+        "distribution": [
+          {
+            "actions": [
+              "ST",
+              "ST",
+              "ST"
+            ],
+            "count": 391,
+            "fraction": 1.0
+          }
+        ],
+        "empty_patches": 153,
+        "nonempty_patches": 391,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 1
+      }
+    },
+    {
+      "dataset": "JapaneseVowels",
+      "variant": "interaction_dynamic",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 9804,
+        "total": 62677,
+        "trainable": 62677
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 2.115098817999751,
+      "config_sha256": "160c524751bba92e6d797d4ee0b613945a6eef774bf5bd79329c666a2ad035ba",
+      "checkpoint_sha256": "f906eb17e23c354b0c1d6d63e12e5921329e730718d15253ac0236b1c090324a",
+      "diagnostics_sha256": "788c009a2c27d2dbd9f89be47fbdf26d805a6db1c4233b8b2576853b2ca90b27",
+      "comparison_protocol_sha256": "bf3a4e4bdcd6f9a7a3b360e18aa6b3d1bed3e96c2ea37d25790fe9cc94c8429c",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/JapaneseVowels/interaction_dynamic/seed-0/20261014T134111Z-a12e6302/result.json",
+      "result_sha256": "a455341ef7202eae396149b932f6aaf76c944039cb5c65fb50d9ffd92698c0a6",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "population_std": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          4692,
+          4692,
+          4692
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 1.0,
+        "committed_patches": 391,
+        "diagnostic_seconds": 0.16778638700088777,
+        "distribution": [
+          {
+            "actions": [
+              "S",
+              "COMMIT"
+            ],
+            "count": 391,
+            "fraction": 1.0
+          }
+        ],
+        "empty_patches": 153,
+        "nonempty_patches": 391,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 1
+      }
+    },
+    {
+      "dataset": "JapaneseVowels",
+      "variant": "interaction_no_commit",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 9804,
+        "total": 62677,
+        "trainable": 62677
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 2.4152592749996984,
+      "config_sha256": "a66f54e1784a6ca833d7fb238be6120b0da984a238429cf1f7a959e8fbde057e",
+      "checkpoint_sha256": "208bcf1703bb8556d7e93d301840a730eee1d2dee3d488487188e4a65a8f5aba",
+      "diagnostics_sha256": "41975bee52c67438d6536fe827be141a8809432111ceae94d08e7b44e4674595",
+      "comparison_protocol_sha256": "bf3a4e4bdcd6f9a7a3b360e18aa6b3d1bed3e96c2ea37d25790fe9cc94c8429c",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/JapaneseVowels/interaction_no_commit/seed-0/20261014T134119Z-033e569e/result.json",
+      "result_sha256": "432ce6bc194d325e7549c419869a92c14ee009d4a16e9a918adcb5aa8711dfde",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "population_std": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          4692,
+          4692,
+          4692
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 0.2294154860010167,
+        "distribution": [
+          {
+            "actions": [
+              "S",
+              "S",
+              "ST"
+            ],
+            "count": 337,
+            "fraction": 0.8618925831202046
+          },
+          {
+            "actions": [
+              "S",
+              "ST",
+              "ST"
+            ],
+            "count": 54,
+            "fraction": 0.13810741687979539
+          }
+        ],
+        "empty_patches": 153,
+        "nonempty_patches": 391,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 2
+      }
+    },
+    {
+      "dataset": "JapaneseVowels",
+      "variant": "interaction_no_communication",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 0,
+        "total": 52873,
+        "trainable": 52873
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 0.7413916300010897,
+      "config_sha256": "2a224787d8fc34ae1ad686d6dae702915d8faf47c6d3b0d44a03a4fddc68ac98",
+      "checkpoint_sha256": "abffdb53a6671513dcafaacd411db9cac0c163c217de072766bb66a71d10f3dd",
+      "diagnostics_sha256": "b83fdf0f42ccba4eeca3386d25645abdc30e81ebdc2035cfb8cb71adda82ba7e",
+      "comparison_protocol_sha256": "bf3a4e4bdcd6f9a7a3b360e18aa6b3d1bed3e96c2ea37d25790fe9cc94c8429c",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/JapaneseVowels/interaction_no_communication/seed-0/20261014T134111Z-1cdcc3a7/result.json",
+      "result_sha256": "4dbff0910592d7fe2dd239941babe77911102b6e7f87a8db60a674010d73532c",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "population_std": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          4692,
+          4692,
+          4692
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 0.06595515300068655,
+        "distribution": [
+          {
+            "actions": [
+              "T",
+              "S",
+              "ST"
+            ],
+            "count": 391,
+            "fraction": 1.0
+          }
+        ],
+        "empty_patches": 153,
+        "nonempty_patches": 391,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 1
+      }
+    },
+    {
+      "dataset": "JapaneseVowels",
+      "variant": "interaction_preplanned",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 9804,
+        "total": 62677,
+        "trainable": 62677
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 1.7010298419991159,
+      "config_sha256": "fb2ee409d893c627c0c869c1fa087805f9e10d6e55c9490e82d979449f679a9a",
+      "checkpoint_sha256": "0f731c3e2d7786e18f2e1b4682d3f97fab8650a83d202c8f0ad68c98163c870a",
+      "diagnostics_sha256": "838aeadf74af3433c15258e4ccc3005adc53dd88c309ea137852b9bc2cef7454",
+      "comparison_protocol_sha256": "bf3a4e4bdcd6f9a7a3b360e18aa6b3d1bed3e96c2ea37d25790fe9cc94c8429c",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/JapaneseVowels/interaction_preplanned/seed-0/20261014T134111Z-ff5f092e/result.json",
+      "result_sha256": "16068e62d071ac2eebffaf9293b4bb1ec2ae58be4bbf469b6715f4f2eb58d924",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "population_std": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          4692,
+          4692,
+          4692
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 1.0,
+        "committed_patches": 391,
+        "diagnostic_seconds": 0.09435315299924696,
+        "distribution": [
+          {
+            "actions": [
+              "S",
+              "COMMIT"
+            ],
+            "count": 391,
+            "fraction": 1.0
+          }
+        ],
+        "empty_patches": 153,
+        "nonempty_patches": 391,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 1
+      }
+    },
+    {
+      "dataset": "JapaneseVowels",
+      "variant": "write_content",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 0,
+        "total": 56106,
+        "trainable": 56106
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 0.9196819799999503,
+      "config_sha256": "a65cb74364d2012392d18f732425875539ce938c9927ce0b79795f6a12828900",
+      "checkpoint_sha256": "12bc20016abc619f0d63ee0d3c70d23a6ad0191c2f07085e775d362212056c40",
+      "diagnostics_sha256": "40cf410ff55ec0cd757f25d323f3b5cce3d2f6230cb778b5cb834b6da4218821",
+      "comparison_protocol_sha256": "bf3a4e4bdcd6f9a7a3b360e18aa6b3d1bed3e96c2ea37d25790fe9cc94c8429c",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/JapaneseVowels/write_content/seed-0/20261014T134111Z-1073376a/result.json",
+      "result_sha256": "fbd2da00c9feb740b30138899b150cb0d3e828aadba0609a69b8cb83be73316d",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          0.6372904139304914,
+          0.6386694546347486,
+          0.5991951506664279
+        ],
+        "population_std": [
+          0.07253595490754812,
+          0.07471269224094615,
+          0.07246049963718745
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          4692,
+          4692,
+          4692
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 0.096332244000223,
+        "distribution": [
+          {
+            "actions": [
+              "T",
+              "S",
+              "ST"
+            ],
+            "count": 391,
+            "fraction": 1.0
+          }
+        ],
+        "empty_patches": 153,
+        "nonempty_patches": 391,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 1
+      }
+    },
+    {
+      "dataset": "JapaneseVowels",
+      "variant": "write_static",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 0,
+        "total": 52876,
+        "trainable": 52876
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 0.8190877369997906,
+      "config_sha256": "4a65d54152652ac3f3a6c4a6d6a55ae287a1fe7a8d53e67419749896c956a3b1",
+      "checkpoint_sha256": "190595c8f678d76c85021f1fbc15e76212799a3179b57d2ce89cb4fddecda73b",
+      "diagnostics_sha256": "5d80e38c97332e0c60a80ce60a73e9c50c58b8dc8f396f351044d0930390a764",
+      "comparison_protocol_sha256": "bf3a4e4bdcd6f9a7a3b360e18aa6b3d1bed3e96c2ea37d25790fe9cc94c8429c",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/JapaneseVowels/write_static/seed-0/20261014T134104Z-f9d4a504/result.json",
+      "result_sha256": "d6cba79db978ae85be13d66f2665a8787aaf9bdba712e9f1a4b1ee09473fb32a",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          0.5015470227520382,
+          0.4989618730666997,
+          0.5011339622588618
+        ],
+        "population_std": [
+          0.00026143202073397517,
+          0.0,
+          0.00021884127057940358
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          4692,
+          4692,
+          4692
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 0.09009180400062178,
+        "distribution": [
+          {
+            "actions": [
+              "T",
+              "S",
+              "ST"
+            ],
+            "count": 391,
+            "fraction": 1.0
+          }
+        ],
+        "empty_patches": 153,
+        "nonempty_patches": 391,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 1
+      }
+    },
+    {
+      "dataset": "Physionet2012",
+      "variant": "history_both",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 0,
+        "total": 53442,
+        "trainable": 53442
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 35.134576112001014,
+      "config_sha256": "209bb054373d8508542ce109fb14fd7d6e5a01d1ed33e0cd7aee8d47a651288d",
+      "checkpoint_sha256": "a617a4397920cab613622f854d77a9df6fe5ad2f7759fe232466213c529919fe",
+      "diagnostics_sha256": "a72ba1c9faec8835c67a7566e14b9f53431ca059c53b9340e2481a5879a742ce",
+      "comparison_protocol_sha256": "e922dae3ff1da833e2df83374a5b8f6b3ca602e2a45e42ceb5a606e70a8cf9da",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/Physionet2012/history_both/seed-0/20261014T134158Z-13e87145/result.json",
+      "result_sha256": "d234bd525dfc5c280f4898c9ccf43cc0c0f56b7e322d7b1f96a0d00cd3d0a362",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "population_std": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          122277,
+          122277,
+          122277
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 4.316998966000028,
+        "distribution": [
+          {
+            "actions": [
+              "T",
+              "S",
+              "ST"
+            ],
+            "count": 7914,
+            "fraction": 1.0
+          }
+        ],
+        "empty_patches": 86,
+        "nonempty_patches": 7914,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 1
+      }
+    },
+    {
+      "dataset": "Physionet2012",
+      "variant": "history_reread",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 0,
+        "total": 53442,
+        "trainable": 53442
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 34.34009912699912,
+      "config_sha256": "f3966f2abd2ef8a44d23eec1297fd991eece29bc2f9cf99beeee63a194a1fd60",
+      "checkpoint_sha256": "b9e0007386866f7ee7e75f258a43203fafe4cbd85ef40938a9562f6cfbebc3f3",
+      "diagnostics_sha256": "02de6612105a59e4fb14798fb519d5d0243a4129c612440aad55e8cc5ada4b43",
+      "comparison_protocol_sha256": "e922dae3ff1da833e2df83374a5b8f6b3ca602e2a45e42ceb5a606e70a8cf9da",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/Physionet2012/history_reread/seed-0/20261014T134158Z-01569aaa/result.json",
+      "result_sha256": "140f79ef9bd9972bf600ed6036d1a3114a3783f469834d61b0471c2a4ed93eaf",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "population_std": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          122277,
+          122277,
+          122277
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 4.294297697000729,
+        "distribution": [
+          {
+            "actions": [
+              "T",
+              "S",
+              "ST"
+            ],
+            "count": 7914,
+            "fraction": 1.0
+          }
+        ],
+        "empty_patches": 86,
+        "nonempty_patches": 7914,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 1
+      }
+    },
+    {
+      "dataset": "Physionet2012",
+      "variant": "history_state",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 0,
+        "total": 53442,
+        "trainable": 53442
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 28.006204792000062,
+      "config_sha256": "b49854f06d782b2f5f35941d3088ac135e6148f7d04d0e3ad8c39232e8c42e65",
+      "checkpoint_sha256": "a1e4e743e0cd728cff60bf723755929d79b00bba5455e58fc4723d070abe00ce",
+      "diagnostics_sha256": "76edd89ac17621b6be4821ce5ff546e483ebab512f33860b5506606f82cb5a5a",
+      "comparison_protocol_sha256": "e922dae3ff1da833e2df83374a5b8f6b3ca602e2a45e42ceb5a606e70a8cf9da",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/Physionet2012/history_state/seed-0/20261014T134202Z-e11fa53b/result.json",
+      "result_sha256": "704047ba15fd2ce163fe825dd5dbbce1dbf16183b7f06133f10b700b96f86cbb",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "population_std": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          122277,
+          122277,
+          122277
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 3.435143799000798,
+        "distribution": [
+          {
+            "actions": [
+              "T",
+              "S",
+              "ST"
+            ],
+            "count": 7914,
+            "fraction": 1.0
+          }
+        ],
+        "empty_patches": 86,
+        "nonempty_patches": 7914,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 1
+      }
+    },
+    {
+      "dataset": "Physionet2012",
+      "variant": "interaction_centralized",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 31140,
+        "total": 84582,
+        "trainable": 84582
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 46.490424738,
+      "config_sha256": "e3454d69909192c91730bf076fe6d876d222d19fad1ffb2b1831ffb562775e8b",
+      "checkpoint_sha256": "5157a46012d97bee5b948d35aa39eaaf770c8ae7ce93f80c027354e19e29d7d7",
+      "diagnostics_sha256": "a3d24e064550d0e084fc42b3462cee3ee83d691cfbfb9b371f413467401fa967",
+      "comparison_protocol_sha256": "e922dae3ff1da833e2df83374a5b8f6b3ca602e2a45e42ceb5a606e70a8cf9da",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/Physionet2012/interaction_centralized/seed-0/20261014T134441Z-682dc482/result.json",
+      "result_sha256": "82198ed1da8604643d212b51eb7b2d3f126c117cc5e562b47b94e37aa9099822",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "population_std": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          122277,
+          122277,
+          122277
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 4.536969999000576,
+        "distribution": [
+          {
+            "actions": [
+              "T",
+              "T",
+              "T"
+            ],
+            "count": 7914,
+            "fraction": 1.0
+          }
+        ],
+        "empty_patches": 86,
+        "nonempty_patches": 7914,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 1
+      }
+    },
+    {
+      "dataset": "Physionet2012",
+      "variant": "interaction_dynamic",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 9804,
+        "total": 63246,
+        "trainable": 63246
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 44.50353457299934,
+      "config_sha256": "44855edb73635b5ea060e4b180d99e80b3f28129e194735b9b7a206afb0ce790",
+      "checkpoint_sha256": "3ce8b3b3c82ea880c17892524560f858dc8ede37d6b406d6ca53fea3f5f22274",
+      "diagnostics_sha256": "52a36a2e8970a4562d601d29f23938efa8610a6f679fa80b1045967a31d3fc53",
+      "comparison_protocol_sha256": "e922dae3ff1da833e2df83374a5b8f6b3ca602e2a45e42ceb5a606e70a8cf9da",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/Physionet2012/interaction_dynamic/seed-0/20261014T134327Z-0f6bba54/result.json",
+      "result_sha256": "2484190badfa1385dc5fe9cdd9fff6daa8d1f1a920977b60cbb791af52ed6daa",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "population_std": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          122277,
+          122277,
+          122277
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 1.0,
+        "committed_patches": 7914,
+        "diagnostic_seconds": 2.2854737329998898,
+        "distribution": [
+          {
+            "actions": [
+              "ST",
+              "COMMIT"
+            ],
+            "count": 7913,
+            "fraction": 0.9998736416477129
+          },
+          {
+            "actions": [
+              "T",
+              "COMMIT"
+            ],
+            "count": 1,
+            "fraction": 0.00012635835228708617
+          }
+        ],
+        "empty_patches": 86,
+        "nonempty_patches": 7914,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 2
+      }
+    },
+    {
+      "dataset": "Physionet2012",
+      "variant": "interaction_no_commit",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 9804,
+        "total": 63246,
+        "trainable": 63246
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 51.063867266999296,
+      "config_sha256": "433b7a87ab55ca2ad34ac09f5d1829dcf4cdbbc88c98ebdd96238aaf8640f3cd",
+      "checkpoint_sha256": "c49d3f74676d65ff9685d88ff018ebce6fc042a733a5d2b6e277231f61dff0bd",
+      "diagnostics_sha256": "d61ab12b2bd5e6873df578c54a90cb7b28255c4e6c414cd0baa3f80c412b59b6",
+      "comparison_protocol_sha256": "e922dae3ff1da833e2df83374a5b8f6b3ca602e2a45e42ceb5a606e70a8cf9da",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/Physionet2012/interaction_no_commit/seed-0/20261014T134441Z-39a0c970/result.json",
+      "result_sha256": "2389d03937c20a4e7cae65a5e40ac3400767374da1db34c90d102c3628b8d35a",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "population_std": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          122277,
+          122277,
+          122277
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 4.533953348000068,
+        "distribution": [
+          {
+            "actions": [
+              "S",
+              "ST",
+              "S"
+            ],
+            "count": 5572,
+            "fraction": 0.7040687389436442
+          },
+          {
+            "actions": [
+              "S",
+              "S",
+              "S"
+            ],
+            "count": 1438,
+            "fraction": 0.1817033105888299
+          },
+          {
+            "actions": [
+              "S",
+              "ST",
+              "T"
+            ],
+            "count": 836,
+            "fraction": 0.10563558251200404
+          },
+          {
+            "actions": [
+              "S",
+              "ST",
+              "ST"
+            ],
+            "count": 66,
+            "fraction": 0.008339651250947688
+          },
+          {
+            "actions": [
+              "S",
+              "T",
+              "S"
+            ],
+            "count": 2,
+            "fraction": 0.00025271670457417233
+          }
+        ],
+        "empty_patches": 86,
+        "nonempty_patches": 7914,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 5
+      }
+    },
+    {
+      "dataset": "Physionet2012",
+      "variant": "interaction_no_communication",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 0,
+        "total": 53442,
+        "trainable": 53442
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 25.907874647000426,
+      "config_sha256": "d60e27a1250d84d30093b9d65bf9b09eb53b9939f1887965754c82d21fc00a59",
+      "checkpoint_sha256": "f4223ff761463442858e1ad5e1059ea398a60344c849e11abe050423f131c43b",
+      "diagnostics_sha256": "46f65fe60bce0de4f631832fb3a53cbe4f33b6db16aa15d29fde8f4df23e226f",
+      "comparison_protocol_sha256": "e922dae3ff1da833e2df83374a5b8f6b3ca602e2a45e42ceb5a606e70a8cf9da",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/Physionet2012/interaction_no_communication/seed-0/20261014T134324Z-73bc6e71/result.json",
+      "result_sha256": "e882ab3b07934791f54799849f64cbcf8145c3abaf18ea45a9c3c42ad12e95dd",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "population_std": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          122277,
+          122277,
+          122277
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 2.950724865000666,
+        "distribution": [
+          {
+            "actions": [
+              "T",
+              "S",
+              "ST"
+            ],
+            "count": 7914,
+            "fraction": 1.0
+          }
+        ],
+        "empty_patches": 86,
+        "nonempty_patches": 7914,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 1
+      }
+    },
+    {
+      "dataset": "Physionet2012",
+      "variant": "interaction_preplanned",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 9804,
+        "total": 63246,
+        "trainable": 63246
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 40.20626968100078,
+      "config_sha256": "8db66eb685b2094fa8589000201d074941f1afad1bb1da7cb7741998fdc7fb62",
+      "checkpoint_sha256": "3e9e032ef5b6b76e8499f06d9ac29b770b51b5f07ad9c6b6fcecf0887687602a",
+      "diagnostics_sha256": "2f24bc984bb4a9f4845f71e881a82083ae9d4612f4ccd4ef9e5fd420463676db",
+      "comparison_protocol_sha256": "e922dae3ff1da833e2df83374a5b8f6b3ca602e2a45e42ceb5a606e70a8cf9da",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/Physionet2012/interaction_preplanned/seed-0/20261014T134327Z-711eacc2/result.json",
+      "result_sha256": "d5dfab0d63b02fed2229415f062ba3ab2aa4ac01f97dca9292c1516f9bb627b4",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "population_std": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          122277,
+          122277,
+          122277
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 1.0,
+        "committed_patches": 7914,
+        "diagnostic_seconds": 2.073288734000016,
+        "distribution": [
+          {
+            "actions": [
+              "ST",
+              "COMMIT"
+            ],
+            "count": 7914,
+            "fraction": 1.0
+          }
+        ],
+        "empty_patches": 86,
+        "nonempty_patches": 7914,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 1
+      }
+    },
+    {
+      "dataset": "Physionet2012",
+      "variant": "write_content",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 0,
+        "total": 56675,
+        "trainable": 56675
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 30.319948864998878,
+      "config_sha256": "868a079d4fa5de4a2c65fad12853eb9a22fa12f23b0b673e33d11daa68861c8a",
+      "checkpoint_sha256": "09b0de593967d204cc0162aad982716c235b0a7a5773e8d93aa1723ee8a72fdd",
+      "diagnostics_sha256": "61eac4cb8013a8fb5ca1ef9665a90f8fc755394f51c13a4a725e0d35876bbcb0",
+      "comparison_protocol_sha256": "e922dae3ff1da833e2df83374a5b8f6b3ca602e2a45e42ceb5a606e70a8cf9da",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/Physionet2012/write_content/seed-0/20261014T134321Z-d8fe5a6a/result.json",
+      "result_sha256": "58dbe6883ec196565c7503a3475e495dd92e94345895972ff8686e60d6156b67",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          0.5319990039469386,
+          0.7040312962159354,
+          0.7379911286974975
+        ],
+        "population_std": [
+          0.10791290134416326,
+          0.08137685764970945,
+          0.07305179251205139
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          122277,
+          122277,
+          122277
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 3.080817873998967,
+        "distribution": [
+          {
+            "actions": [
+              "T",
+              "S",
+              "ST"
+            ],
+            "count": 7914,
+            "fraction": 1.0
+          }
+        ],
+        "empty_patches": 86,
+        "nonempty_patches": 7914,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 1
+      }
+    },
+    {
+      "dataset": "Physionet2012",
+      "variant": "write_static",
+      "seed": 0,
+      "profile": "smoke",
+      "status": "success",
+      "epochs_completed": 1,
+      "parameters": {
+        "policy": 0,
+        "total": 53445,
+        "trainable": 53445
+      },
+      "validation_checks": {
+        "action_paths_cover_nonempty_patches": true,
+        "finite_metrics": true,
+        "predictions_reconstructed": true
+      },
+      "fit_seconds": 28.118758680999235,
+      "config_sha256": "8e5e3eb57c3b0a4e1626c7d5a67c34f46376437ffa459316a986eec1b7a833fd",
+      "checkpoint_sha256": "9263fe4543529805bbd2a8ab6f6f90a5f146a16454261f492186b2a3e8b4af79",
+      "diagnostics_sha256": "fee23c6dd7961326ac7f2dfd16499faa2c386e4e6a2a4fe096bbaa7a73b3aaa4",
+      "comparison_protocol_sha256": "e922dae3ff1da833e2df83374a5b8f6b3ca602e2a45e42ceb5a606e70a8cf9da",
+      "source_sha256": "8d5d0aadf07dc651f9b66e215b825c434f6439c3bf840327937cd3c5c8ad7777",
+      "result_path": "results/local-method-ablation-smoke/smoke/Physionet2012/write_static/seed-0/20261014T134203Z-15d16dc7/result.json",
+      "result_sha256": "23033f77bf101feccabf4c612219d8d07710fde990010940c9767bd2825537b3",
+      "gate": {
+        "interpretation": "Soft write gates do not block later attention or communication and do not imply compute savings.",
+        "mean": [
+          0.5016441773162126,
+          0.5022958596169179,
+          0.507766359460361
+        ],
+        "population_std": [
+          0.00016509634824116775,
+          0.0,
+          0.00010037731685308292
+        ],
+        "role_order": [
+          "T",
+          "S",
+          "ST"
+        ],
+        "scope": "initial memory write, over valid current-patch channel tokens",
+        "valid_token_count": [
+          122277,
+          122277,
+          122277
+        ]
+      },
+      "action_paths": {
+        "commit_patch_fraction": 0.0,
+        "committed_patches": 0,
+        "diagnostic_seconds": 3.6780030999998417,
+        "distribution": [
+          {
+            "actions": [
+              "T",
+              "S",
+              "ST"
+            ],
+            "count": 7914,
+            "fraction": 1.0
+          }
+        ],
+        "empty_patches": 86,
+        "nonempty_patches": 7914,
+        "scope": "deterministic best-checkpoint validation paths; diagnostic pass excluded from predict_seconds",
+        "unique_paths": 1
+      }
+    }
+  ]
+}

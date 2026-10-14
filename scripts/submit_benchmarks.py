@@ -26,6 +26,7 @@ import uuid
 ROOT = Path(__file__).resolve().parents[1]
 GPU_MODELS = {"TIMESNET", "BRITS"}
 MAX_ACCOUNTING_POLLS = 5
+SHARED_SUBMISSION_LOCK = Path.home() / ".cache/imts/submission.lock"
 TERMINAL = {"COMPLETED", "FAILED", "CANCELLED", "TIMEOUT", "NODE_FAIL",
             "OUT_OF_MEMORY", "PREEMPTED", "BOOT_FAIL", "DEADLINE", "REVOKED"}
 INVENTORY_CODE = """
@@ -107,6 +108,25 @@ def select_batch(tasks, args):
     if any(not isinstance(value, int) or isinstance(value, bool) or value < 1
            for value in limits.values()):
         raise ValueError("Batch sizes must be positive integers")
+    total = getattr(args, "total_batch_size", None)
+    if total is not None:
+        if not isinstance(total, int) or isinstance(total, bool) or total < 1:
+            raise ValueError("Total batch size must be a positive integer")
+        pools = {group: [task for task in tasks
+                         if (task["device"] == "cuda") == (group == "gpu")][:limits[group]]
+                 for group in ("cpu", "gpu")}
+        # Alternate pools so a total cap cannot starve either device. Once one
+        # pool is depleted, the other can use the remaining places in this wave.
+        selected, offsets = [], {"cpu": 0, "gpu": 0}
+        while len(selected) < total:
+            before = len(selected)
+            for group in ("cpu", "gpu"):
+                if len(selected) < total and offsets[group] < len(pools[group]):
+                    selected.append(pools[group][offsets[group]])
+                    offsets[group] += 1
+            if len(selected) == before:
+                break
+        return selected
     counts = {"cpu": 0, "gpu": 0}
     selected = []
     for task in tasks:
@@ -147,6 +167,42 @@ def file_lock(path, blocking=False):
         except BlockingIOError as exc:
             raise RuntimeError(f"Another submission/worker holds {path}; try later") from exc
         yield
+
+
+def active_user_jobs():
+    """Count every queued/running array element; never trust compressed output."""
+    command = ["squeue", "-h", "-r", "-u", getpass.getuser(), "-o", "%i"]
+    result = subprocess.run(command, text=True, capture_output=True)
+    if result.returncode:
+        raise RuntimeError(f"Cannot check user job quota: {result.stderr.strip() or 'squeue failed'}. "
+                           "No quota assumption was made.")
+    jobs = set()
+    for line in result.stdout.splitlines():
+        value = line.strip()
+        if not re.fullmatch(r"[0-9]+(?:_[0-9]+)?", value):
+            raise RuntimeError(f"Cannot check user job quota: malformed expanded squeue job ID {value!r}. "
+                               "No quota assumption was made.")
+        jobs.add(value)
+    return jobs
+
+
+def check_submission_headroom(max_user_jobs, task_count, submitted=()):
+    """Check all remaining tasks before any further sbatch in a locked wave."""
+    if max_user_jobs is None:
+        return
+    if (not isinstance(max_user_jobs, int) or isinstance(max_user_jobs, bool)
+            or max_user_jobs < 1):
+        raise ValueError("Maximum user jobs must be a positive integer")
+    active = active_user_jobs()
+    # An accepted array may not yet appear in squeue. Conservatively reserve
+    # each of its elements until this wave has been fully submitted.
+    active.update(f"{job_id}_{index}" for job_id, count in submitted for index in range(count))
+    available = max_user_jobs - len(active)
+    if task_count > available:
+        raise RuntimeError(f"Insufficient submission headroom: {len(active)} active/reserved user jobs, "
+                           f"limit {max_user_jobs}, {max(0, available)} places available, "
+                           f"but this wave still requires {task_count}. "
+                           "Reduce the batch size or wait for jobs to finish; no automatic retry was made.")
 
 
 def successful_tasks(output, tasks, source, env, revision):
@@ -253,6 +309,19 @@ def submit(args, root, output, ledger, tasks, source, env, datasets, revision, s
     tasks = select_batch(tasks, args)
     if not tasks:
         raise ValueError("Cannot submit an empty batch")
+    # Separate worktrees use separate experiment locks, but share this brief
+    # queue-check/submission lock with the method launcher. Do not hold it while
+    # waiting for training: the other experiment must be able to submit too.
+    with file_lock(SHARED_SUBMISSION_LOCK):
+        try:
+            check_submission_headroom(getattr(args, "max_user_jobs", None), len(tasks))
+        except RuntimeError as exc:
+            raise RuntimeError(f"{exc} No array was submitted for this wave. "
+                               "Existing jobs were not cancelled.") from exc
+        return _submit_locked(args, root, output, ledger, tasks, source, env, datasets, revision, skipped)
+
+
+def _submit_locked(args, root, output, ledger, tasks, source, env, datasets, revision, skipped):
     batch_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:8]
     folder = ledger / batch_id
     folder.mkdir(parents=True)
@@ -285,6 +354,14 @@ def submit(args, root, output, ledger, tasks, source, env, datasets, revision, s
     for group, group_tasks in groups.items():
         if not group_tasks:
             continue
+        try:
+            check_submission_headroom(getattr(args, "max_user_jobs", None),
+                                      len(tasks) - sum(count for _, count in submitted), submitted)
+        except RuntimeError as exc:
+            earlier = (f"Earlier confirmed arrays: {', '.join(job for job, _ in submitted)}. "
+                       "They were not cancelled; check their current state before another submission."
+                       if submitted else "No array was submitted in this batch.")
+            raise RuntimeError(f"{exc} {earlier}") from exc
         headers = [line for line in Path(templates[group]["path"]).read_text().splitlines()
                    if line.startswith("#SBATCH")]
         command = [str(root / ".venv/bin/python"), str(worker_path), "--worker",
@@ -365,8 +442,9 @@ def run_batches(args, root, output, ledger, tasks, source, env, datasets,
                 revision, skipped, pending):
     """Submit one bounded batch, or watch sequential batches until attempted.
 
-    The caller holds the submission lock throughout. Failed training is never
-    retried within this invocation; fresh invocations may explicitly retry it.
+    The caller holds this experiment's lock throughout; the shared user lock
+    is held only during submissions. Failed training is never retried within
+    this invocation; fresh invocations may explicitly retry it.
     """
     if not args.watch:
         submit(args, root, output, ledger, pending, source, env, datasets, revision, skipped)
@@ -489,6 +567,10 @@ def main():
                         help="maximum CPU tasks submitted per wave (default 4)")
     parser.add_argument("--gpu-batch-size", type=positive_int, default=2,
                         help="maximum GPU tasks submitted per wave (default 2)")
+    parser.add_argument("--total-batch-size", type=positive_int,
+                        help="optional combined CPU/GPU wave cap; alternates devices and fills unused places")
+    parser.add_argument("--max-user-jobs", type=positive_int,
+                        help="optional user-wide queued/running job cap, checked under a shared submission lock")
     parser.add_argument("--cpu-time", type=time_limit, default="02:00:00")
     parser.add_argument("--gpu-time", type=time_limit, default="01:00:00")
     parser.add_argument("--max-dense-gib", type=float, default=8.0)

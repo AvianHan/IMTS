@@ -1,0 +1,1139 @@
+{
+  "schema_version": 1,
+  "experiment_family": "imts_agents",
+  "stage": "exploratory_validation_pilot",
+  "selection_rule": "All twelve predeclared core/motivation variants; exactly one fresh seed-0 fit each; no result-based selection or retries.",
+  "test_evaluated": false,
+  "dataset": "JapaneseVowels",
+  "split_counts": {
+    "test": 370,
+    "train": 202,
+    "val": 68
+  },
+  "comparison_protocol_sha256": "2783a8c3f08c57cd0426b843a22dd503c633b55fc89030c4707fab3d9e21d6c6",
+  "comparison_protocol": {
+    "batch_size": 32,
+    "cost_weight": 0.001,
+    "data_source": {
+      "data_revision": "f416b1b432f248a73323222f2378d0e8433ca6d2",
+      "generator_seed": null,
+      "sha256": "20f1909acb5bba1b680f7ef32f1ea3990ef5d7b9dc54fd1357a23e09c8e3ed06",
+      "source": "pyrregular"
+    },
+    "dataset": "JapaneseVowels",
+    "device": "cpu",
+    "entropy_weight": 0.001,
+    "epochs": 100,
+    "evaluate_test": false,
+    "gradient_clip": 5.0,
+    "hidden": 32,
+    "label_sha256": {
+      "test": "5766cfc96bae23ad212c39f3a3852f2b45b1a07836cba28f91b4d31f4a5be3b2",
+      "train": "dd25d74336ff10ce9b4bd6511b19054447f092c36f28fd385ad87b1609792893",
+      "val": "0b1a5a18a045506298b3deb92fcd17b413fc0bdae2618e5ef8b419d3a81dd009"
+    },
+    "learning_rate": 0.001,
+    "max_inner_steps": 3,
+    "n_patches": 8,
+    "patience": 15,
+    "policy_weight": 1.0,
+    "preprocessing_sha256": "6b4caee70748277785fbb01f2a0cc078bd195dda09d6e7f913cf6d4ed2eb6d6f",
+    "sample_ids_sha256": {
+      "test": "08f7a0e402b1d1175f02e6b98b175b0a8f8df5d6f5c4b82f39e7a0979bbefdd0",
+      "train": "dbf2b832e1be72cf213f5c699b1b9a7639cf53a5b08171e8f4d74f6c64e042f5",
+      "val": "cf8808100211699dbf6577659d86f21f70d56c505b4d450f62752ec6634cc8f0"
+    },
+    "seed": 0,
+    "smoke": false,
+    "software_versions": {
+      "numpy": "1.26.4",
+      "pyrregular": "0.4.1.dev4+g94644559d",
+      "scikit-learn": "1.5.2",
+      "torch": "2.6.0+cpu"
+    },
+    "source_sha256": "77c57ba1c8253555375bb96e5bd56da029386f42ede1153381a95f6c2a9c7313",
+    "threads": 1,
+    "weight_decay": 0.0001
+  },
+  "runtime_context": "Local CPU, one torch thread per fit. Core fits started with at most two parallel fits; later motivation experiments overlapped with up to four local training processes. Not Orion or GPU timings.",
+  "limitations": [
+    "Validation was used for checkpoint selection; these are not unbiased test scores.",
+    "One seed and one small validation split do not establish significance or generality.",
+    "T/S/ST core variants have more parameters than single-ALL controls; additional matched-capacity controls are required.",
+    "Equal role-update counts are not equal FLOPs or equal wall time.",
+    "Patch statistics compress within-patch event information; this is a prototype representation.",
+    "JapaneseVowels numeric timestamps do not establish physical seconds or comprehensive irregularity coverage."
+  ],
+  "runs": [
+    {
+      "run_id": "20261013T141752Z-e7fc4498",
+      "variant": "core_none",
+      "status": "success",
+      "profile": "validation",
+      "seed": 0,
+      "metrics": {
+        "accuracy": 0.9264705882352942,
+        "macro_f1": 0.9199597787833083,
+        "macro_precision": 0.9228395061728395,
+        "macro_recall": 0.9226190476190477
+      },
+      "parameters": {
+        "policy": 0,
+        "total": 21257,
+        "trainable": 21257
+      },
+      "fit_seconds": 44.87778067400359,
+      "predict_seconds": 0.059939416001725476,
+      "best_epoch": 69,
+      "epochs_completed": 84,
+      "stop_reason": "early_stopping",
+      "started_at": "2026-10-13T14:17:52.957349+00:00",
+      "finished_at": "2026-10-13T14:18:40.387282+00:00",
+      "config_sha256": "7adea733446b94fb95b9d30a9d28f9f4ce4892526b747ce6b12a5ed3b5d1510c",
+      "checkpoint_sha256": "7c83df661885c92984438ac92d50cb8c1de2bc0b64398640e12e4b0ac99b2e68",
+      "prepared_data_sha256": {
+        "test": "30bc2f7a6e875f639e23865d786cf1c5b90efa5d8391df8a30e89cac15ae3cb8",
+        "train": "3e6f4ada286bab9ac420ae2703a26176ae339c599be33d196d84c6e70f152eba",
+        "val": "9ec8f6784573d164aae76fabe07989e30f9a347db94b00cb634ce0c70837c870"
+      },
+      "result_path": "results/local-method-pilot/validation/JapaneseVowels/core_none/seed-0/20261013T141752Z-e7fc4498/result.json",
+      "result_sha256": "dc689442e2bac95ef1c30e77d788a96d08ff3a4636695fc1be35e9bbc9863693",
+      "validation": {
+        "cost": {
+          "action_order": [
+            "ALL",
+            "unused_1",
+            "unused_2",
+            "COMMIT"
+          ],
+          "mean_action_counts_per_sample": [
+            17.25,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "mean_role_updates_per_sample": 17.25,
+          "predict_seconds": 0.059939416001725476,
+          "samples": 68,
+          "seconds_per_sample": 0.0008814620000253746
+        },
+        "metrics": {
+          "accuracy": 0.9264705882352942,
+          "macro_f1": 0.9199597787833083,
+          "macro_precision": 0.9228395061728395,
+          "macro_recall": 0.9226190476190477
+        },
+        "predictions_file": "val_predictions.npz",
+        "predictions_sha256": "5709ea2092e2f7e82ff61ac43d349d5c3bfb36094e7446709f1f19a4be03c85f"
+      },
+      "variant_spec": {
+        "allow_commit": false,
+        "communication": true,
+        "description": "Reset one ALL-relation memory each patch; three updates.",
+        "group": "core",
+        "homogeneous_roles": false,
+        "name": "core_none",
+        "outer_recurrent": false,
+        "parameter_matched": false,
+        "reference": null,
+        "routing": "fixed",
+        "specialized_roles": false,
+        "time_features": true
+      }
+    },
+    {
+      "run_id": "20261013T141752Z-fed368f9",
+      "variant": "core_outer",
+      "status": "success",
+      "profile": "validation",
+      "seed": 0,
+      "metrics": {
+        "accuracy": 0.9117647058823529,
+        "macro_f1": 0.9042544964113591,
+        "macro_precision": 0.9217813051146384,
+        "macro_recall": 0.9087301587301587
+      },
+      "parameters": {
+        "policy": 0,
+        "total": 21257,
+        "trainable": 21257
+      },
+      "fit_seconds": 35.86171970899886,
+      "predict_seconds": 0.0554119919979712,
+      "best_epoch": 49,
+      "epochs_completed": 64,
+      "stop_reason": "early_stopping",
+      "started_at": "2026-10-13T14:17:52.959944+00:00",
+      "finished_at": "2026-10-13T14:18:31.487307+00:00",
+      "config_sha256": "5821eac028f79d9d4a24aeea45d8c5171aae77b69bf1e705fcda89a75da36c55",
+      "checkpoint_sha256": "5a728329668eb546c11b50e0d99b804ca67f1785d654d49ccee8591e71afd338",
+      "prepared_data_sha256": {
+        "test": "30bc2f7a6e875f639e23865d786cf1c5b90efa5d8391df8a30e89cac15ae3cb8",
+        "train": "3e6f4ada286bab9ac420ae2703a26176ae339c599be33d196d84c6e70f152eba",
+        "val": "9ec8f6784573d164aae76fabe07989e30f9a347db94b00cb634ce0c70837c870"
+      },
+      "result_path": "results/local-method-pilot/validation/JapaneseVowels/core_outer/seed-0/20261013T141752Z-fed368f9/result.json",
+      "result_sha256": "98102fbc3f9e7febdea409173867a0bd6b1d1975ed5f419d091169d186d160e4",
+      "validation": {
+        "cost": {
+          "action_order": [
+            "ALL",
+            "unused_1",
+            "unused_2",
+            "COMMIT"
+          ],
+          "mean_action_counts_per_sample": [
+            17.25,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "mean_role_updates_per_sample": 17.25,
+          "predict_seconds": 0.0554119919979712,
+          "samples": 68,
+          "seconds_per_sample": 0.0008148822352642823
+        },
+        "metrics": {
+          "accuracy": 0.9117647058823529,
+          "macro_f1": 0.9042544964113591,
+          "macro_precision": 0.9217813051146384,
+          "macro_recall": 0.9087301587301587
+        },
+        "predictions_file": "val_predictions.npz",
+        "predictions_sha256": "61e1159f63920118e3dd6343a312d201f6ba064ff818e9a77a313e20085f5ccc"
+      },
+      "variant_spec": {
+        "allow_commit": false,
+        "communication": true,
+        "description": "Carry one ALL-relation memory across patches; three updates.",
+        "group": "core",
+        "homogeneous_roles": false,
+        "name": "core_outer",
+        "outer_recurrent": true,
+        "parameter_matched": false,
+        "reference": "core_none",
+        "routing": "fixed",
+        "specialized_roles": false,
+        "time_features": true
+      }
+    },
+    {
+      "run_id": "20261013T141850Z-86391e7f",
+      "variant": "core_inner",
+      "status": "success",
+      "profile": "validation",
+      "seed": 0,
+      "metrics": {
+        "accuracy": 0.9411764705882353,
+        "macro_f1": 0.9377217553688142,
+        "macro_precision": 0.9455467372134039,
+        "macro_recall": 0.9384920634920635
+      },
+      "parameters": {
+        "policy": 0,
+        "total": 52873,
+        "trainable": 52873
+      },
+      "fit_seconds": 24.977772336998896,
+      "predict_seconds": 0.08003777499834541,
+      "best_epoch": 22,
+      "epochs_completed": 37,
+      "stop_reason": "early_stopping",
+      "started_at": "2026-10-13T14:18:50.762718+00:00",
+      "finished_at": "2026-10-13T14:19:18.506068+00:00",
+      "config_sha256": "0a50d95dc823b2d8b4890c6032a6c8fa24475f3e05cb22d410fe96cb4b61f05a",
+      "checkpoint_sha256": "d904fdb97225be7a8ad2b6f5b3e41c9638a01e55dc0f91277a09b0533f958a0e",
+      "prepared_data_sha256": {
+        "test": "30bc2f7a6e875f639e23865d786cf1c5b90efa5d8391df8a30e89cac15ae3cb8",
+        "train": "3e6f4ada286bab9ac420ae2703a26176ae339c599be33d196d84c6e70f152eba",
+        "val": "9ec8f6784573d164aae76fabe07989e30f9a347db94b00cb634ce0c70837c870"
+      },
+      "result_path": "results/local-method-pilot/validation/JapaneseVowels/core_inner/seed-0/20261013T141850Z-86391e7f/result.json",
+      "result_sha256": "a6ce90a49e78172689a4b84b18568f131e7210dd111e30ae36e7cfc97566ea35",
+      "validation": {
+        "cost": {
+          "action_order": [
+            "T",
+            "S",
+            "ST",
+            "COMMIT"
+          ],
+          "mean_action_counts_per_sample": [
+            5.75,
+            5.75,
+            5.75,
+            0.0
+          ],
+          "mean_role_updates_per_sample": 17.25,
+          "predict_seconds": 0.08003777499834541,
+          "samples": 68,
+          "seconds_per_sample": 0.0011770261029168444
+        },
+        "metrics": {
+          "accuracy": 0.9411764705882353,
+          "macro_f1": 0.9377217553688142,
+          "macro_precision": 0.9455467372134039,
+          "macro_recall": 0.9384920634920635
+        },
+        "predictions_file": "val_predictions.npz",
+        "predictions_sha256": "b0cd644a424503c1b7e00ffa044306718809c07d41037521f424467fa340f209"
+      },
+      "variant_spec": {
+        "allow_commit": false,
+        "communication": true,
+        "description": "Reset T/S/ST memories each patch; fixed T then S then ST.",
+        "group": "core",
+        "homogeneous_roles": false,
+        "name": "core_inner",
+        "outer_recurrent": false,
+        "parameter_matched": false,
+        "reference": "core_none",
+        "routing": "fixed",
+        "specialized_roles": true,
+        "time_features": true
+      }
+    },
+    {
+      "run_id": "20261013T141905Z-11197d31",
+      "variant": "core_both",
+      "status": "success",
+      "profile": "validation",
+      "seed": 0,
+      "metrics": {
+        "accuracy": 0.9411764705882353,
+        "macro_f1": 0.9377217553688142,
+        "macro_precision": 0.9455467372134039,
+        "macro_recall": 0.9384920634920635
+      },
+      "parameters": {
+        "policy": 0,
+        "total": 52873,
+        "trainable": 52873
+      },
+      "fit_seconds": 24.669340991000354,
+      "predict_seconds": 0.07112570599565515,
+      "best_epoch": 20,
+      "epochs_completed": 35,
+      "stop_reason": "early_stopping",
+      "started_at": "2026-10-13T14:19:05.850919+00:00",
+      "finished_at": "2026-10-13T14:19:33.214720+00:00",
+      "config_sha256": "4334b67663c2a3b0e1339c30f3f04519c2cef7b8ab7af21c03b5db94cfe00e72",
+      "checkpoint_sha256": "3d9a5f15485fcdae758dd75069a8ed79106ffb5ea8d30013dba835683c633a53",
+      "prepared_data_sha256": {
+        "test": "30bc2f7a6e875f639e23865d786cf1c5b90efa5d8391df8a30e89cac15ae3cb8",
+        "train": "3e6f4ada286bab9ac420ae2703a26176ae339c599be33d196d84c6e70f152eba",
+        "val": "9ec8f6784573d164aae76fabe07989e30f9a347db94b00cb634ce0c70837c870"
+      },
+      "result_path": "results/local-method-pilot/validation/JapaneseVowels/core_both/seed-0/20261013T141905Z-11197d31/result.json",
+      "result_sha256": "2264e3c1f224f2a0e8fde4dc114951a7c951d1c4c40c2354bfce92be247df7e2",
+      "validation": {
+        "cost": {
+          "action_order": [
+            "T",
+            "S",
+            "ST",
+            "COMMIT"
+          ],
+          "mean_action_counts_per_sample": [
+            5.75,
+            5.75,
+            5.75,
+            0.0
+          ],
+          "mean_role_updates_per_sample": 17.25,
+          "predict_seconds": 0.07112570599565515,
+          "samples": 68,
+          "seconds_per_sample": 0.0010459662646419875
+        },
+        "metrics": {
+          "accuracy": 0.9411764705882353,
+          "macro_f1": 0.9377217553688142,
+          "macro_precision": 0.9455467372134039,
+          "macro_recall": 0.9384920634920635
+        },
+        "predictions_file": "val_predictions.npz",
+        "predictions_sha256": "63305d60ce197bb01e692445a12be8a9c98a1a1bcf4ecdc274fba579bf756b16"
+      },
+      "variant_spec": {
+        "allow_commit": false,
+        "communication": true,
+        "description": "Carry T/S/ST memories across patches; fixed T then S then ST.",
+        "group": "core",
+        "homogeneous_roles": false,
+        "name": "core_both",
+        "outer_recurrent": true,
+        "parameter_matched": false,
+        "reference": "core_none",
+        "routing": "fixed",
+        "specialized_roles": true,
+        "time_features": true
+      }
+    },
+    {
+      "run_id": "20261013T141923Z-775038b9",
+      "variant": "no_communication",
+      "status": "success",
+      "profile": "validation",
+      "seed": 0,
+      "metrics": {
+        "accuracy": 0.9411764705882353,
+        "macro_f1": 0.9377217553688142,
+        "macro_precision": 0.9455467372134039,
+        "macro_recall": 0.9384920634920635
+      },
+      "parameters": {
+        "policy": 0,
+        "total": 52873,
+        "trainable": 52873
+      },
+      "fit_seconds": 22.096786730005988,
+      "predict_seconds": 0.07652589800272835,
+      "best_epoch": 20,
+      "epochs_completed": 35,
+      "stop_reason": "early_stopping",
+      "started_at": "2026-10-13T14:19:23.800015+00:00",
+      "finished_at": "2026-10-13T14:19:48.805898+00:00",
+      "config_sha256": "d47e2d05fa76783901189a4a1cb0604c154820a03454289e5f3ee1f047224ab1",
+      "checkpoint_sha256": "7eb657b2dcef723db81397bd838da762c786855f661fcd788ed8aaf7bfd6451f",
+      "prepared_data_sha256": {
+        "test": "30bc2f7a6e875f639e23865d786cf1c5b90efa5d8391df8a30e89cac15ae3cb8",
+        "train": "3e6f4ada286bab9ac420ae2703a26176ae339c599be33d196d84c6e70f152eba",
+        "val": "9ec8f6784573d164aae76fabe07989e30f9a347db94b00cb634ce0c70837c870"
+      },
+      "result_path": "results/local-method-pilot/validation/JapaneseVowels/no_communication/seed-0/20261013T141923Z-775038b9/result.json",
+      "result_sha256": "aac996d5ff48e903ec2bb8b1a4e1d15e9567b86dd2893e7b5e0d26231dbaeae3",
+      "validation": {
+        "cost": {
+          "action_order": [
+            "T",
+            "S",
+            "ST",
+            "COMMIT"
+          ],
+          "mean_action_counts_per_sample": [
+            5.75,
+            5.75,
+            5.75,
+            0.0
+          ],
+          "mean_role_updates_per_sample": 17.25,
+          "predict_seconds": 0.07652589800272835,
+          "samples": 68,
+          "seconds_per_sample": 0.0011253808529812994
+        },
+        "metrics": {
+          "accuracy": 0.9411764705882353,
+          "macro_f1": 0.9377217553688142,
+          "macro_precision": 0.9455467372134039,
+          "macro_recall": 0.9384920634920635
+        },
+        "predictions_file": "val_predictions.npz",
+        "predictions_sha256": "d582d7365a53c9cdc99466e3239bfd6a9a426315b7465ece79ea7bed10503fc5"
+      },
+      "variant_spec": {
+        "allow_commit": false,
+        "communication": false,
+        "description": "Same fixed order and memory updates; zero inter-role messages.",
+        "group": "motivation",
+        "homogeneous_roles": false,
+        "name": "no_communication",
+        "outer_recurrent": true,
+        "parameter_matched": false,
+        "reference": "core_both",
+        "routing": "fixed",
+        "specialized_roles": true,
+        "time_features": true
+      }
+    },
+    {
+      "run_id": "20261013T141951Z-45d0e06a",
+      "variant": "dynamic_feedback",
+      "status": "success",
+      "profile": "validation",
+      "seed": 0,
+      "metrics": {
+        "accuracy": 0.9411764705882353,
+        "macro_f1": 0.9377217553688142,
+        "macro_precision": 0.9455467372134039,
+        "macro_recall": 0.9384920634920635
+      },
+      "parameters": {
+        "policy": 9804,
+        "total": 62677,
+        "trainable": 62677
+      },
+      "fit_seconds": 81.13803895599995,
+      "predict_seconds": 0.16654649099655217,
+      "best_epoch": 34,
+      "epochs_completed": 49,
+      "stop_reason": "early_stopping",
+      "started_at": "2026-10-13T14:19:51.814993+00:00",
+      "finished_at": "2026-10-13T14:21:15.894921+00:00",
+      "config_sha256": "378f297c9f7d758773f11f6f44577404c41e61b51fe6343981b70a8fa62df4ef",
+      "checkpoint_sha256": "b9f7fe6cfa22259609986fb635a1ffd131730e2d4b7f5a373c97dc8d9740ee75",
+      "prepared_data_sha256": {
+        "test": "30bc2f7a6e875f639e23865d786cf1c5b90efa5d8391df8a30e89cac15ae3cb8",
+        "train": "3e6f4ada286bab9ac420ae2703a26176ae339c599be33d196d84c6e70f152eba",
+        "val": "9ec8f6784573d164aae76fabe07989e30f9a347db94b00cb634ce0c70837c870"
+      },
+      "result_path": "results/local-method-pilot/validation/JapaneseVowels/dynamic_feedback/seed-0/20261013T141951Z-45d0e06a/result.json",
+      "result_sha256": "537789dbeca95ab65f2fd68279af4edd362d5fc401f832e37e69d0b4ab1e3926",
+      "validation": {
+        "cost": {
+          "action_order": [
+            "T",
+            "S",
+            "ST",
+            "COMMIT"
+          ],
+          "mean_action_counts_per_sample": [
+            11.5,
+            5.75,
+            0.0,
+            0.0
+          ],
+          "mean_role_updates_per_sample": 17.25,
+          "predict_seconds": 0.16654649099655217,
+          "samples": 68,
+          "seconds_per_sample": 0.002449213102890473
+        },
+        "metrics": {
+          "accuracy": 0.9411764705882353,
+          "macro_f1": 0.9377217553688142,
+          "macro_precision": 0.9455467372134039,
+          "macro_recall": 0.9384920634920635
+        },
+        "predictions_file": "val_predictions.npz",
+        "predictions_sha256": "ba00c523d918837ab9be6e7e55a9b8e0869886d8af5b4e2e23793637baa9660e"
+      },
+      "variant_spec": {
+        "allow_commit": true,
+        "communication": true,
+        "description": "Local policies use current memories/messages; average-logit consensus selects each next action.",
+        "group": "motivation",
+        "homogeneous_roles": false,
+        "name": "dynamic_feedback",
+        "outer_recurrent": true,
+        "parameter_matched": false,
+        "reference": "core_both",
+        "routing": "distributed_feedback",
+        "specialized_roles": true,
+        "time_features": true
+      }
+    },
+    {
+      "run_id": "20261013T142118Z-cebdc95b",
+      "variant": "preplanned_path",
+      "status": "success",
+      "profile": "validation",
+      "seed": 0,
+      "metrics": {
+        "accuracy": 0.9411764705882353,
+        "macro_f1": 0.9368502956738252,
+        "macro_precision": 0.9440035273368608,
+        "macro_recall": 0.9384920634920635
+      },
+      "parameters": {
+        "policy": 9804,
+        "total": 62677,
+        "trainable": 62677
+      },
+      "fit_seconds": 95.84481307999522,
+      "predict_seconds": 0.1035160370010999,
+      "best_epoch": 46,
+      "epochs_completed": 61,
+      "stop_reason": "early_stopping",
+      "started_at": "2026-10-13T14:21:18.731685+00:00",
+      "finished_at": "2026-10-13T14:22:57.647005+00:00",
+      "config_sha256": "df001e30ffa725ca5c43b2a078c4590377a08d49274b55409c1816beab7eb40a",
+      "checkpoint_sha256": "e3b9609eda9d60f3faaba7c3af15c0cf13cfe7c12ed5c7691dbef57d75db19b2",
+      "prepared_data_sha256": {
+        "test": "30bc2f7a6e875f639e23865d786cf1c5b90efa5d8391df8a30e89cac15ae3cb8",
+        "train": "3e6f4ada286bab9ac420ae2703a26176ae339c599be33d196d84c6e70f152eba",
+        "val": "9ec8f6784573d164aae76fabe07989e30f9a347db94b00cb634ce0c70837c870"
+      },
+      "result_path": "results/local-method-pilot/validation/JapaneseVowels/preplanned_path/seed-0/20261013T142118Z-cebdc95b/result.json",
+      "result_sha256": "9399712b2d05592d6845e0850626ae34e0685da01021c05ff72c2d5e616e59c1",
+      "validation": {
+        "cost": {
+          "action_order": [
+            "T",
+            "S",
+            "ST",
+            "COMMIT"
+          ],
+          "mean_action_counts_per_sample": [
+            11.5,
+            5.75,
+            0.0,
+            0.0
+          ],
+          "mean_role_updates_per_sample": 17.25,
+          "predict_seconds": 0.1035160370010999,
+          "samples": 68,
+          "seconds_per_sample": 0.001522294661780881
+        },
+        "metrics": {
+          "accuracy": 0.9411764705882353,
+          "macro_f1": 0.9368502956738252,
+          "macro_precision": 0.9440035273368608,
+          "macro_recall": 0.9384920634920635
+        },
+        "predictions_file": "val_predictions.npz",
+        "predictions_sha256": "9d37d3a72b4d6673715c46362f940acb52aa251c19be3f6c98e38b4653aaad8a"
+      },
+      "variant_spec": {
+        "allow_commit": true,
+        "communication": true,
+        "description": "Same policy architecture, but all action distributions use the patch-start observation, without intermediate feedback.",
+        "group": "motivation",
+        "homogeneous_roles": false,
+        "name": "preplanned_path",
+        "outer_recurrent": true,
+        "parameter_matched": false,
+        "reference": "dynamic_feedback",
+        "routing": "preplanned",
+        "specialized_roles": true,
+        "time_features": true
+      }
+    },
+    {
+      "run_id": "20261013T142300Z-c10b5194",
+      "variant": "centralized_router",
+      "status": "success",
+      "profile": "validation",
+      "seed": 0,
+      "metrics": {
+        "accuracy": 0.9411764705882353,
+        "macro_f1": 0.9377217553688142,
+        "macro_precision": 0.9455467372134039,
+        "macro_recall": 0.9384920634920635
+      },
+      "parameters": {
+        "policy": 31140,
+        "total": 84013,
+        "trainable": 84013
+      },
+      "fit_seconds": 80.93111593099457,
+      "predict_seconds": 0.1762271499974304,
+      "best_epoch": 35,
+      "epochs_completed": 50,
+      "stop_reason": "early_stopping",
+      "started_at": "2026-10-13T14:23:00.067640+00:00",
+      "finished_at": "2026-10-13T14:24:23.788674+00:00",
+      "config_sha256": "231576697d663dd917f20cfdb87d2d4933f7aa90a05fab47663c6a7025b91802",
+      "checkpoint_sha256": "84c89ccc7acc2a2c81678ec232d3ccfcc7463b8036e724b54c6f50c286b3443d",
+      "prepared_data_sha256": {
+        "test": "30bc2f7a6e875f639e23865d786cf1c5b90efa5d8391df8a30e89cac15ae3cb8",
+        "train": "3e6f4ada286bab9ac420ae2703a26176ae339c599be33d196d84c6e70f152eba",
+        "val": "9ec8f6784573d164aae76fabe07989e30f9a347db94b00cb634ce0c70837c870"
+      },
+      "result_path": "results/local-method-pilot/validation/JapaneseVowels/centralized_router/seed-0/20261013T142300Z-c10b5194/result.json",
+      "result_sha256": "d5ed97cff41396e0f531e526a5d790fc3b914f5f6119b75367c4bdc50acedee1",
+      "validation": {
+        "cost": {
+          "action_order": [
+            "T",
+            "S",
+            "ST",
+            "COMMIT"
+          ],
+          "mean_action_counts_per_sample": [
+            5.926470756530762,
+            2.75,
+            8.573529243469238,
+            0.0
+          ],
+          "mean_role_updates_per_sample": 17.25,
+          "predict_seconds": 0.1762271499974304,
+          "samples": 68,
+          "seconds_per_sample": 0.0025915757352563294
+        },
+        "metrics": {
+          "accuracy": 0.9411764705882353,
+          "macro_f1": 0.9377217553688142,
+          "macro_precision": 0.9455467372134039,
+          "macro_recall": 0.9384920634920635
+        },
+        "predictions_file": "val_predictions.npz",
+        "predictions_sha256": "681ea87317cb573efbc85512b4280f04d614acca3ec49695021b1acda8a34208"
+      },
+      "variant_spec": {
+        "allow_commit": true,
+        "communication": true,
+        "description": "A single recurrent controller receives all role observations and selects each next action.",
+        "group": "motivation",
+        "homogeneous_roles": false,
+        "name": "centralized_router",
+        "outer_recurrent": true,
+        "parameter_matched": false,
+        "reference": "dynamic_feedback",
+        "routing": "centralized",
+        "specialized_roles": true,
+        "time_features": true
+      }
+    },
+    {
+      "run_id": "20261013T141923Z-5591370d",
+      "variant": "no_commit",
+      "status": "success",
+      "profile": "validation",
+      "seed": 0,
+      "metrics": {
+        "accuracy": 0.9264705882352942,
+        "macro_f1": 0.9240196078431373,
+        "macro_precision": 0.9320987654320988,
+        "macro_recall": 0.9246031746031745
+      },
+      "parameters": {
+        "policy": 9804,
+        "total": 62677,
+        "trainable": 62677
+      },
+      "fit_seconds": 67.69450511799369,
+      "predict_seconds": 0.20814227200025925,
+      "best_epoch": 22,
+      "epochs_completed": 37,
+      "stop_reason": "early_stopping",
+      "started_at": "2026-10-13T14:19:23.846037+00:00",
+      "finished_at": "2026-10-13T14:20:34.725144+00:00",
+      "config_sha256": "af00fe24375bac7d7363b27dfbc1be87780f5b0beffa6eab13d1409a660c553e",
+      "checkpoint_sha256": "cd2ad10da8babe2e55a12a63cd42deb687c25735141fc552e6ffc334f0acc10b",
+      "prepared_data_sha256": {
+        "test": "30bc2f7a6e875f639e23865d786cf1c5b90efa5d8391df8a30e89cac15ae3cb8",
+        "train": "3e6f4ada286bab9ac420ae2703a26176ae339c599be33d196d84c6e70f152eba",
+        "val": "9ec8f6784573d164aae76fabe07989e30f9a347db94b00cb634ce0c70837c870"
+      },
+      "result_path": "results/local-method-pilot/validation/JapaneseVowels/no_commit/seed-0/20261013T141923Z-5591370d/result.json",
+      "result_sha256": "30761b7350031197594b5c6249a50d4acf6dde2ea63322aef12eb1774be2186a",
+      "validation": {
+        "cost": {
+          "action_order": [
+            "T",
+            "S",
+            "ST",
+            "COMMIT"
+          ],
+          "mean_action_counts_per_sample": [
+            5.75,
+            5.970588207244873,
+            5.529411792755127,
+            0.0
+          ],
+          "mean_role_updates_per_sample": 17.25,
+          "predict_seconds": 0.20814227200025925,
+          "samples": 68,
+          "seconds_per_sample": 0.003060915764709695
+        },
+        "metrics": {
+          "accuracy": 0.9264705882352942,
+          "macro_f1": 0.9240196078431373,
+          "macro_precision": 0.9320987654320988,
+          "macro_recall": 0.9246031746031745
+        },
+        "predictions_file": "val_predictions.npz",
+        "predictions_sha256": "2c98256222eacf4e69481b3a16009aae1a580402f9a08309e63f5c02a7b45221"
+      },
+      "variant_spec": {
+        "allow_commit": false,
+        "communication": true,
+        "description": "Feedback-based role choice with exactly three updates: compare core_both for dynamic selection at equal update count, and dynamic_feedback for the effect of COMMIT.",
+        "group": "motivation",
+        "homogeneous_roles": false,
+        "name": "no_commit",
+        "outer_recurrent": true,
+        "parameter_matched": false,
+        "reference": "core_both",
+        "routing": "distributed_feedback",
+        "specialized_roles": true,
+        "time_features": true
+      }
+    },
+    {
+      "run_id": "20261013T142037Z-1f5be533",
+      "variant": "no_time",
+      "status": "success",
+      "profile": "validation",
+      "seed": 0,
+      "metrics": {
+        "accuracy": 0.9411764705882353,
+        "macro_f1": 0.9377217553688142,
+        "macro_precision": 0.9455467372134039,
+        "macro_recall": 0.9384920634920635
+      },
+      "parameters": {
+        "policy": 0,
+        "total": 52873,
+        "trainable": 52873
+      },
+      "fit_seconds": 22.77419350299897,
+      "predict_seconds": 0.09121900199534139,
+      "best_epoch": 19,
+      "epochs_completed": 34,
+      "stop_reason": "early_stopping",
+      "started_at": "2026-10-13T14:20:37.189336+00:00",
+      "finished_at": "2026-10-13T14:21:02.773750+00:00",
+      "config_sha256": "0e0315065ba89af8778c9ff21a484a90801253ed2a79861dfc25c832af4b7353",
+      "checkpoint_sha256": "9b0056dd0e5189d131306f713140a8211da08ebd310353707537eb7c6c96aaec",
+      "prepared_data_sha256": {
+        "test": "53e87a7e4b9ba416b129b36ef445439ccac9a1634aa2024e1917294c8eb58cfb",
+        "train": "506f6709e7137b9891be46a222ece41d6ccd5e4d643819104b4091a5b726c58a",
+        "val": "22aa51435c3cdd319a89374a980be1d1cd4d275f43f964502f565ce1f6cef508"
+      },
+      "result_path": "results/local-method-pilot/validation/JapaneseVowels/no_time/seed-0/20261013T142037Z-1f5be533/result.json",
+      "result_sha256": "530e0b311acb60f96a8f54dcbde55f44985b593bccff00d7cd6158e3a5afa097",
+      "validation": {
+        "cost": {
+          "action_order": [
+            "T",
+            "S",
+            "ST",
+            "COMMIT"
+          ],
+          "mean_action_counts_per_sample": [
+            5.75,
+            5.75,
+            5.75,
+            0.0
+          ],
+          "mean_role_updates_per_sample": 17.25,
+          "predict_seconds": 0.09121900199534139,
+          "samples": 68,
+          "seconds_per_sample": 0.001341455911696197
+        },
+        "metrics": {
+          "accuracy": 0.9411764705882353,
+          "macro_f1": 0.9377217553688142,
+          "macro_precision": 0.9455467372134039,
+          "macro_recall": 0.9384920634920635
+        },
+        "predictions_file": "val_predictions.npz",
+        "predictions_sha256": "353cad782b22be7613e2f69837b5cb3a4fc73b7c2b34a4d6e73be4deb893081a"
+      },
+      "variant_spec": {
+        "allow_commit": false,
+        "communication": true,
+        "description": "Fixed T/S/ST model with within-patch time and time-gap features zeroed by the data pipeline; chronological patch structure remains.",
+        "group": "motivation",
+        "homogeneous_roles": false,
+        "name": "no_time",
+        "outer_recurrent": true,
+        "parameter_matched": false,
+        "reference": "core_both",
+        "routing": "fixed",
+        "specialized_roles": true,
+        "time_features": false
+      }
+    },
+    {
+      "run_id": "20261013T142105Z-a1cb97fd",
+      "variant": "homogeneous_roles",
+      "status": "success",
+      "profile": "validation",
+      "seed": 0,
+      "metrics": {
+        "accuracy": 0.9264705882352942,
+        "macro_f1": 0.9133935055503684,
+        "macro_precision": 0.9356701940035274,
+        "macro_recall": 0.9206349206349207
+      },
+      "parameters": {
+        "policy": 0,
+        "total": 52873,
+        "trainable": 52873
+      },
+      "fit_seconds": 27.90118824300589,
+      "predict_seconds": 0.08463377499720082,
+      "best_epoch": 24,
+      "epochs_completed": 39,
+      "stop_reason": "early_stopping",
+      "started_at": "2026-10-13T14:21:05.542968+00:00",
+      "finished_at": "2026-10-13T14:21:36.483829+00:00",
+      "config_sha256": "5a30fdf670e8f6d142d7cccf2a92c910b9c8b97995889a54a4ddf4de757cab04",
+      "checkpoint_sha256": "383c3f37b340aca28d71f8d14497bf29a311ca0ea35acfddc2693d9ea023d986",
+      "prepared_data_sha256": {
+        "test": "30bc2f7a6e875f639e23865d786cf1c5b90efa5d8391df8a30e89cac15ae3cb8",
+        "train": "3e6f4ada286bab9ac420ae2703a26176ae339c599be33d196d84c6e70f152eba",
+        "val": "9ec8f6784573d164aae76fabe07989e30f9a347db94b00cb634ce0c70837c870"
+      },
+      "result_path": "results/local-method-pilot/validation/JapaneseVowels/homogeneous_roles/seed-0/20261013T142105Z-a1cb97fd/result.json",
+      "result_sha256": "a9576ca80c2e7c8af6eea4029ae79f39c58a520f8410bd50d64fb188037791a2",
+      "validation": {
+        "cost": {
+          "action_order": [
+            "ALL_0",
+            "ALL_1",
+            "ALL_2",
+            "COMMIT"
+          ],
+          "mean_action_counts_per_sample": [
+            5.75,
+            5.75,
+            5.75,
+            0.0
+          ],
+          "mean_role_updates_per_sample": 17.25,
+          "predict_seconds": 0.08463377499720082,
+          "samples": 68,
+          "seconds_per_sample": 0.0012446143381941296
+        },
+        "metrics": {
+          "accuracy": 0.9264705882352942,
+          "macro_f1": 0.9133935055503684,
+          "macro_precision": 0.9356701940035274,
+          "macro_recall": 0.9206349206349207
+        },
+        "predictions_file": "val_predictions.npz",
+        "predictions_sha256": "8fcb257e29a50c32122f770e9cb1c9fa0c1ac7bc0c463b976428c55aae3d4528"
+      },
+      "variant_spec": {
+        "allow_commit": false,
+        "communication": true,
+        "description": "Three independently parameterised ALL-relation memories, with the same communication and fixed update budget.",
+        "group": "motivation",
+        "homogeneous_roles": true,
+        "name": "homogeneous_roles",
+        "outer_recurrent": true,
+        "parameter_matched": false,
+        "reference": "core_both",
+        "routing": "fixed",
+        "specialized_roles": false,
+        "time_features": true
+      }
+    },
+    {
+      "run_id": "20261013T142138Z-56424d75",
+      "variant": "single_matched",
+      "status": "success",
+      "profile": "validation",
+      "seed": 0,
+      "metrics": {
+        "accuracy": 0.9264705882352942,
+        "macro_f1": 0.9218487394957984,
+        "macro_precision": 0.9296737213403881,
+        "macro_recall": 0.9226190476190477
+      },
+      "parameters": {
+        "policy": 0,
+        "total": 52879,
+        "trainable": 52879
+      },
+      "fit_seconds": 63.62795338199794,
+      "predict_seconds": 0.08972342400375055,
+      "best_epoch": 62,
+      "epochs_completed": 77,
+      "stop_reason": "early_stopping",
+      "started_at": "2026-10-13T14:21:38.967690+00:00",
+      "finished_at": "2026-10-13T14:22:44.985669+00:00",
+      "config_sha256": "aa7df322033b0914332ea9d32f949fb2bb2e97bfe0b8a1a4a64b3aa27549c75f",
+      "checkpoint_sha256": "5aa7910186cdc2a5731060888cb4eafb8f631ae085f4a0987e8e1334766e08f8",
+      "prepared_data_sha256": {
+        "test": "30bc2f7a6e875f639e23865d786cf1c5b90efa5d8391df8a30e89cac15ae3cb8",
+        "train": "3e6f4ada286bab9ac420ae2703a26176ae339c599be33d196d84c6e70f152eba",
+        "val": "9ec8f6784573d164aae76fabe07989e30f9a347db94b00cb634ce0c70837c870"
+      },
+      "result_path": "results/local-method-pilot/validation/JapaneseVowels/single_matched/seed-0/20261013T142138Z-56424d75/result.json",
+      "result_sha256": "c02a337cd19108a42cd4d65c1ef372e919040f6deca6330da2e63c363f236470",
+      "validation": {
+        "cost": {
+          "action_order": [
+            "ALL",
+            "unused_1",
+            "unused_2",
+            "COMMIT"
+          ],
+          "mean_action_counts_per_sample": [
+            17.25,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "mean_role_updates_per_sample": 17.25,
+          "predict_seconds": 0.08972342400375055,
+          "samples": 68,
+          "seconds_per_sample": 0.001319462117702214
+        },
+        "metrics": {
+          "accuracy": 0.9264705882352942,
+          "macro_f1": 0.9218487394957984,
+          "macro_precision": 0.9296737213403881,
+          "macro_recall": 0.9226190476190477
+        },
+        "predictions_file": "val_predictions.npz",
+        "predictions_sha256": "0eb2ba8b9f42e03295c618ca6080222e4a875a4920de12b81e0b69a1e302bda3"
+      },
+      "variant_spec": {
+        "allow_commit": false,
+        "communication": true,
+        "description": "One ALL-relation memory with added active capacity to approximately match core_both parameter count; still three updates.",
+        "group": "motivation",
+        "homogeneous_roles": false,
+        "name": "single_matched",
+        "outer_recurrent": true,
+        "parameter_matched": true,
+        "reference": "core_both",
+        "routing": "fixed",
+        "specialized_roles": false,
+        "time_features": true
+      }
+    }
+  ],
+  "motivation_results": "All eight motivation controls completed successfully with the same validation protocol; official test remains unevaluated.",
+  "validation_observations": {
+    "outer_recurrence": "core_outer scored below core_none; core_both tied core_inner in this single seed/split.",
+    "specialization": "core_both exceeded approximate parameter-matched ALL and homogeneous-roles controls on this validation split; this is preliminary, not significance or generality evidence.",
+    "communication_and_time": "no_communication and no_time tied core_both; this split does not establish necessity of either component.",
+    "dynamic_routing": "dynamic_feedback and centralized_router tied core_both; no_commit scored below core_both; feedback superiority and decentralized-policy necessity are not established.",
+    "compute": "dynamic_feedback mean validation role updates equals fixed core_both (17.25), and ST/COMMIT means are zero; no measured role-update saving in its best checkpoint."
+  },
+  "routing_diagnostic": {
+    "path": "results/local-method-pilot/diagnostics/routing-paths.json",
+    "sha256": "95c6b87023a546286d6ceaf19c3f2e373d1ba76cf04b63df03f71af010c792ec",
+    "scope": "validation",
+    "test_evaluated": false,
+    "diagnostic": "Deterministic argmax action sequences from saved best checkpoints; no additional training.",
+    "interpretation": "On this dataset, split, seed, and saved checkpoints, dynamic_feedback and preplanned_path choose the same S->T->T path in all 391 nonempty validation patches. This does not establish input-adaptive routing, feedback necessity, or useful early COMMIT. It does not imply that the policies lack capacity to adapt.",
+    "runs": [
+      {
+        "variant": "dynamic_feedback",
+        "samples": 68,
+        "nonempty_patches": 391,
+        "patterns": [
+          {
+            "action_ids": [
+              1,
+              0,
+              0
+            ],
+            "actions": [
+              "S",
+              "T",
+              "T"
+            ],
+            "count": 391
+          }
+        ],
+        "unique_patterns": 1,
+        "checkpoint_sha256": "b9f7fe6cfa22259609986fb635a1ffd131730e2d4b7f5a373c97dc8d9740ee75"
+      },
+      {
+        "variant": "preplanned_path",
+        "samples": 68,
+        "nonempty_patches": 391,
+        "patterns": [
+          {
+            "action_ids": [
+              1,
+              0,
+              0
+            ],
+            "actions": [
+              "S",
+              "T",
+              "T"
+            ],
+            "count": 391
+          }
+        ],
+        "unique_patterns": 1,
+        "checkpoint_sha256": "e3b9609eda9d60f3faaba7c3af15c0cf13cfe7c12ed5c7691dbef57d75db19b2"
+      },
+      {
+        "variant": "no_commit",
+        "samples": 68,
+        "nonempty_patches": 391,
+        "patterns": [
+          {
+            "action_ids": [
+              1,
+              0,
+              1
+            ],
+            "actions": [
+              "S",
+              "T",
+              "S"
+            ],
+            "count": 15
+          },
+          {
+            "action_ids": [
+              1,
+              0,
+              2
+            ],
+            "actions": [
+              "S",
+              "T",
+              "ST"
+            ],
+            "count": 376
+          }
+        ],
+        "unique_patterns": 2,
+        "checkpoint_sha256": "cd2ad10da8babe2e55a12a63cd42deb687c25735141fc552e6ffc334f0acc10b"
+      },
+      {
+        "variant": "centralized_router",
+        "samples": 68,
+        "nonempty_patches": 391,
+        "patterns": [
+          {
+            "action_ids": [
+              0,
+              0,
+              0
+            ],
+            "actions": [
+              "T",
+              "T",
+              "T"
+            ],
+            "count": 74
+          },
+          {
+            "action_ids": [
+              0,
+              0,
+              2
+            ],
+            "actions": [
+              "T",
+              "T",
+              "ST"
+            ],
+            "count": 51
+          },
+          {
+            "action_ids": [
+              0,
+              2,
+              2
+            ],
+            "actions": [
+              "T",
+              "ST",
+              "ST"
+            ],
+            "count": 79
+          },
+          {
+            "action_ids": [
+              1,
+              2,
+              2
+            ],
+            "actions": [
+              "S",
+              "ST",
+              "ST"
+            ],
+            "count": 187
+          }
+        ],
+        "unique_patterns": 4,
+        "checkpoint_sha256": "84c89ccc7acc2a2c81678ec232d3ccfcc7463b8036e724b54c6f50c286b3443d"
+      }
+    ]
+  }
+}

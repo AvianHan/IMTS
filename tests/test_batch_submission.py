@@ -42,6 +42,7 @@ def experiment(tmp_path, monkeypatch):
     output = root / "results/jv-first-full"
     config = launcher.read_json(root / "configs/datasets.json")
     monkeypatch.setattr(launcher, "ROOT", root)
+    monkeypatch.setattr(launcher, "SHARED_SUBMISSION_LOCK", tmp_path / "shared/submission.lock")
     monkeypatch.setattr(launcher, "inventory", lambda _: ENVIRONMENT)
     return SimpleNamespace(
         root=root, output=output, ledger=root / "results/accounting/batches",
@@ -125,6 +126,23 @@ def test_dry_run_reuses_exactly_six_successes_without_writing_or_submitting(expe
     assert "Deferred: 240" in output
     assert "DRY RUN: no jobs submitted" in output
     assert snapshot(exp.root) == before
+
+
+def test_total_cap_cli_dry_run_stays_read_only_and_does_not_query_queue(experiment, monkeypatch, capsys):
+    exp = experiment
+    monkeypatch.setattr(sys, "argv", [
+        "submit_benchmarks.py", "--cpu-batch-size", "56", "--gpu-batch-size", "56",
+        "--total-batch-size", "56", "--max-user-jobs", "60",
+        "--cpu-concurrency", "56", "--gpu-concurrency", "56",
+    ])
+    before = snapshot(exp.root)
+    def unexpected(*args, **kwargs):
+        pytest.fail("A quota-cap dry run must not query Slurm or submit anything")
+    monkeypatch.setattr(launcher.subprocess, "run", unexpected)
+    assert launcher.main() == 0
+    assert "Next batch: 56 = CPU 28 + GPU 28" in capsys.readouterr().out
+    assert snapshot(exp.root) == before
+    assert not launcher.SHARED_SUBMISSION_LOCK.exists()
 
 
 @pytest.mark.parametrize("change,expected", [
@@ -237,6 +255,130 @@ def test_batch_selection_preserves_per_device_order_and_caps_total_submission():
     selected = launcher.select_batch(tasks, submit_arguments(
         cpu_batch_size=2, gpu_batch_size=1, cpu_concurrency=8, gpu_concurrency=4))
     assert selected == [task("BRITS", 0), task("ROCKET", 0), task("ROCKET", 1)]
+
+
+def test_total_cap_interleaves_pools_and_preserves_their_order():
+    tasks = [task("ROCKET", seed) for seed in range(40)] + [task("BRITS", seed) for seed in range(40)]
+    selected = launcher.select_batch(tasks, submit_arguments(
+        cpu_batch_size=56, gpu_batch_size=56, total_batch_size=56))
+    assert len(selected) == 56
+    assert selected == [entry for seed in range(28) for entry in (task("ROCKET", seed), task("BRITS", seed))]
+
+
+@pytest.mark.parametrize("cpu_count,gpu_count,cpu_cap,gpu_cap,expected", [
+    (3, 80, 56, 56, (3, 53)),
+    (80, 0, 56, 56, (56, 0)),
+    (0, 80, 56, 56, (0, 56)),
+    (80, 80, 4, 56, (4, 52)),
+    (80, 80, 4, 2, (4, 2)),
+])
+def test_total_cap_fills_available_pool_but_honors_per_pool_caps(cpu_count, gpu_count, cpu_cap, gpu_cap, expected):
+    tasks = [task("ROCKET", seed) for seed in range(cpu_count)] + [task("BRITS", seed) for seed in range(gpu_count)]
+    selected = launcher.select_batch(tasks, submit_arguments(
+        cpu_batch_size=cpu_cap, gpu_batch_size=gpu_cap, total_batch_size=56))
+    cpu = [entry for entry in selected if entry["device"] == "cpu"]
+    gpu = [entry for entry in selected if entry["device"] == "cuda"]
+    assert (len(cpu), len(gpu)) == expected
+    assert cpu == [task("ROCKET", seed) for seed in range(expected[0])]
+    assert gpu == [task("BRITS", seed) for seed in range(expected[1])]
+
+
+def test_expanded_user_queue_counts_unique_array_elements(monkeypatch):
+    def fake_squeue(command, **kwargs):
+        assert command == ["squeue", "-h", "-r", "-u", launcher.getpass.getuser(), "-o", "%i"]
+        return subprocess.CompletedProcess(command, 0, "123_0\n123_1\n456\n123_0\n", "")
+    monkeypatch.setattr(launcher.subprocess, "run", fake_squeue)
+    assert launcher.active_user_jobs() == {"123_0", "123_1", "456"}
+
+
+@pytest.mark.parametrize("returncode,stdout,stderr", [
+    (1, "", "controller unavailable"),
+    (0, "123_[0-55]\n", ""),
+    (0, "JOBID\n123\n", ""),
+    (0, "123\n\n", ""),
+    (0, "unexpected response\n", ""),
+])
+def test_quota_query_failure_or_malformed_output_blocks_all_submission(experiment, monkeypatch,
+                                                                      returncode, stdout, stderr):
+    exp, calls = experiment, []
+    def fake_squeue(command, **kwargs):
+        calls.append(command)
+        assert command[0] == "squeue", "A failed quota check must not reach sbatch"
+        return subprocess.CompletedProcess(command, returncode, stdout, stderr)
+    monkeypatch.setattr(launcher.subprocess, "run", fake_squeue)
+    with pytest.raises(RuntimeError, match="Cannot check user job quota"):
+        launcher.submit(submit_arguments(max_user_jobs=60), exp.root, exp.output, exp.ledger,
+                        [task(), task("BRITS")], exp.source, ENVIRONMENT, exp.datasets, exp.revision, {})
+    assert len(calls) == 1
+    assert not exp.ledger.exists()
+
+
+def test_entire_wave_must_fit_before_any_sbatch(experiment, monkeypatch):
+    exp = experiment
+    def fake_squeue(command, **kwargs):
+        assert command[0] == "squeue", "Must reject the whole wave, not submit CPU then discover GPU overflow"
+        return subprocess.CompletedProcess(command, 0, "\n".join(str(i) for i in range(59)) + "\n", "")
+    monkeypatch.setattr(launcher.subprocess, "run", fake_squeue)
+    with pytest.raises(RuntimeError, match="59 active/reserved.*requires 2"):
+        launcher.submit(submit_arguments(max_user_jobs=60), exp.root, exp.output, exp.ledger,
+                        [task(), task("BRITS")], exp.source, ENVIRONMENT, exp.datasets, exp.revision, {})
+    assert not exp.ledger.exists()
+
+
+def test_capped_submission_preserves_concurrency_and_rechecks_each_group(experiment, monkeypatch):
+    exp, calls = experiment, []
+    selected = [task("ROCKET", seed) for seed in range(60)] + [task("BRITS", seed) for seed in range(60)]
+    def fake_run(command, **kwargs):
+        calls.append(command)
+        if command[0] == "squeue":
+            # Four method jobs occupy the reserved places. An accepted CPU
+            # array is intentionally absent, simulating brief queue lag.
+            return subprocess.CompletedProcess(command, 0, "10\n11\n12\n13\n", "")
+        assert command[0] == "sbatch"
+        return subprocess.CompletedProcess(command, 0, "6001\n" if command[-1].endswith("cpu.sbatch") else "6002\n", "")
+    monkeypatch.setattr(launcher.subprocess, "run", fake_run)
+    folder, jobs = launcher.submit(submit_arguments(
+        max_user_jobs=60, cpu_batch_size=56, gpu_batch_size=56, total_batch_size=56,
+        cpu_concurrency=9, gpu_concurrency=7), exp.root, exp.output, exp.ledger,
+        selected, exp.source, ENVIRONMENT, exp.datasets, exp.revision, {})
+    assert jobs == [("6001", 28), ("6002", 28)]
+    assert [command[0] for command in calls] == ["squeue", "squeue", "sbatch", "squeue", "sbatch"]
+    assert "--array=0-27%9" in calls[2]
+    assert "--array=0-27%7" in calls[4]
+    assert len(launcher.read_json(folder / "manifest.json")["tasks"]["cpu"]) == 28
+
+
+def test_queue_race_after_first_group_preserves_receipt_and_never_retries(experiment, monkeypatch):
+    exp, calls = experiment, []
+    def fake_run(command, **kwargs):
+        calls.append(command)
+        if command[0] == "squeue":
+            # An unrelated non-cooperating sbatch consumes places after CPU
+            # submission; our CPU array has not appeared in squeue yet.
+            visible = "\n".join(str(i) for i in range(59)) + "\n" if len(calls) > 3 else ""
+            return subprocess.CompletedProcess(command, 0, visible, "")
+        assert len(calls) == 3 and command[0] == "sbatch"
+        return subprocess.CompletedProcess(command, 0, "6001\n", "")
+    monkeypatch.setattr(launcher.subprocess, "run", fake_run)
+    with pytest.raises(RuntimeError, match="Earlier confirmed arrays: 6001"):
+        launcher.submit(submit_arguments(max_user_jobs=60), exp.root, exp.output, exp.ledger,
+                        [task(), task("BRITS")], exp.source, ENVIRONMENT, exp.datasets, exp.revision, {})
+    folder = next(exp.ledger.iterdir())
+    assert launcher.read_json(folder / "cpu.receipt.json")["status"] == "submitted"
+    assert not (folder / "gpu.intent.json").exists()
+    assert len(calls) == 4
+
+
+def test_shared_submission_lock_blocks_another_launcher(experiment, monkeypatch):
+    exp = experiment
+    def unexpected(*args, **kwargs):
+        pytest.fail("Shared lock must exclude all queue queries and submissions")
+    monkeypatch.setattr(launcher.subprocess, "run", unexpected)
+    with launcher.file_lock(launcher.SHARED_SUBMISSION_LOCK):
+        with pytest.raises(RuntimeError, match="Another submission/worker"):
+            launcher.submit(submit_arguments(max_user_jobs=60), exp.root, exp.output, exp.ledger,
+                            [task()], exp.source, ENVIRONMENT, exp.datasets, exp.revision, {})
+    assert not exp.ledger.exists()
 
 
 def test_queue_activity_or_missing_accounting_never_proves_completion(monkeypatch):

@@ -1,0 +1,85 @@
+{
+  "cache_dir": "/workspace/scratch/dd6a79c01e9a/datasets",
+  "seed": 0,
+  "n_patches": 8,
+  "scope": "dataset preparation only; no model training or official test scoring",
+  "datasets": [
+    {
+      "dataset": "CharacterTrajectories",
+      "shapes": {
+        "train": [
+          1066,
+          8,
+          3,
+          12
+        ],
+        "val": [
+          356,
+          8,
+          3,
+          12
+        ],
+        "test": [
+          1436,
+          8,
+          3,
+          12
+        ]
+      },
+      "classes": 20,
+      "prepare_seconds": 16.999,
+      "arrays_MiB": 3.22711181640625,
+      "maxrss_MiB": 350.95703125
+    },
+    {
+      "dataset": "Physionet2012",
+      "shapes": {
+        "train": [
+          2997,
+          8,
+          37,
+          12
+        ],
+        "val": [
+          1000,
+          8,
+          37,
+          12
+        ],
+        "test": [
+          3993,
+          8,
+          37,
+          12
+        ]
+      },
+      "classes": 2,
+      "prepare_seconds": 46.233,
+      "arrays_MiB": 110.57937622070312,
+      "maxrss_MiB": 1243.5546875
+    }
+  ],
+  "memory_update": {
+    "Physionet2012_after": {
+      "prepare_seconds": 33.74872349600082,
+      "maxrss_MiB": 818.15234375,
+      "estimated_peak_bytes": 1032822448
+    },
+    "test_count": 17,
+    "synthetic_features_bit_exact_against_previous_HEAD": true,
+    "InsectWingbeat_metadata_only": {
+      "shape": [
+        50000,
+        200,
+        22
+      ],
+      "stored_records": 67106800,
+      "file_bytes": 387017571,
+      "metadata_bytes_read": 327680,
+      "estimated_preparation_peak_bytes": 13895176576,
+      "budget_bytes": 17179869184,
+      "full_preparation_run": false,
+      "largest_sample_records_upper_bound": 4400
+    }
+  }
+}

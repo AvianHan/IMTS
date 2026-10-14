@@ -4,6 +4,8 @@ Pyrregular multivariate classification baseline 复现：**ROCKET、BORF、LGBM�
 
 当前阶段是建立可检查的 baseline 实验流程。完整 benchmark 尚未运行；`smoke` 分数不代表论文复现结果。
 
+研究方法的独立实现见 [方法与消融总览](docs/method-overview.md)，首轮实际验证见 [JapaneseVowels 方法 pilot](docs/method-pilot-results.md)，与 baseline 并行运行见 [方法分支及 Orion 操作](docs/method-orion.md)。四组主实验分别开关「跨 time patch 的 recurrent memory」和「内层 T/S/ST 关系分工」，另有八组动机消融。默认只评估 validation；它们属于研究原型，不是正式 baseline 成绩。
+
 ## 先看结构
 
 | 文件 | 作用 |
