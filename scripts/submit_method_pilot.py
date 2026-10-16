@@ -15,6 +15,7 @@ import fcntl
 import getpass
 import hashlib
 import importlib
+import importlib.util
 import json
 import math
 import os
@@ -52,6 +53,23 @@ def source_digest(root):
                 digest.update(str(path.relative_to(root)).encode())
                 digest.update(path.read_bytes())
     return digest.hexdigest()
+
+
+def recovery_helper():
+    path = Path(__file__).with_name("recovery_policy.py")
+    spec = importlib.util.spec_from_file_location("imts_recovery_policy", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def compatible_source(record, task, snapshot):
+    source = record.get("environment", {}).get("source_sha256")
+    policy = snapshot.get("recovery_policy")
+    if policy is None:
+        return source == snapshot["source_sha256"]
+    return (snapshot["source_sha256"] == policy["corrected_source_sha256"]
+            and recovery_helper().source_allowed(policy, source, task["dataset"], task["seed"]))
 
 
 def inventory(python):
@@ -373,6 +391,9 @@ def submit_batch(args, root, tasks, mode, ids, limits, snapshot):
     folder.mkdir(parents=True, exist_ok=False)
     worker_path = folder / "worker.py"
     worker_path.write_bytes(Path(__file__).read_bytes())
+    if snapshot.get("recovery_policy") is not None:
+        helper_path = folder / "recovery_policy.py"
+        helper_path.write_bytes(Path(__file__).with_name("recovery_policy.py").read_bytes())
     template_path = root / "slurm/method_gpu.sbatch"
     template = template_path.read_text()
     manifest = {"schema_version": 2, "batch_id": batch_id,
@@ -383,6 +404,8 @@ def submit_batch(args, root, tasks, mode, ids, limits, snapshot):
                 "resources": {"walltime": args.time, "gpu_per_task": 1, "cpus_per_task": 4,
                               "memory_per_task": "32G", "global_task_cap": limits["effective_submit_cap"]},
                 "quota_snapshot": {"all_user_tasks": len(ids), "limits": limits}}
+    if snapshot.get("recovery_policy") is not None:
+        manifest["recovery_helper_sha256"] = sha256(helper_path)
     manifest_path = folder / "manifest.json"
     write_new(manifest_path, manifest)
     manifest_hash = sha256(manifest_path)
@@ -438,7 +461,7 @@ def valid_success(path, task, mode, snapshot, require_diagnostics=True):
                 or record.get("profile") != ("test" if mode == "test" else "validation")
                 or record.get("config") != expected or record.get("config_sha256") != _digest(expected)
                 or record.get("variant_spec") != asdict(get_variant(task["variant"]))
-                or record.get("environment", {}).get("source_sha256") != snapshot["source_sha256"]
+                or not compatible_source(record, task, snapshot)
                 or normalized_environment(record.get("environment", {})) != snapshot["environment"]
                 or record.get("test_evaluated") != (mode == "test")):
             return False
@@ -527,6 +550,11 @@ def submit(args, root, tasks):
     if not python.is_file():
         raise RuntimeError(f"Missing isolated method environment: {python}")
     snapshot = {"source_sha256": source_digest(root), "environment": inventory(python)}
+    if getattr(args, "recovery_policy", None):
+        policy = recovery_helper().load_policy(args.recovery_policy, root)
+        snapshot.update(recovery_policy=policy,
+                        recovery_policy_sha256=recovery_helper().policy_digest(policy))
+        print("Explicit recovery approval: " + json.dumps(recovery_helper().summary(policy)), flush=True)
     limits = qos_limits()
     limits["effective_submit_cap"] = min(limits["effective_submit_cap"], args.max_user_jobs)
     with plan_lock(root):
@@ -570,6 +598,13 @@ def worker(args):
         raise RuntimeError("Method src/configs changed after submission; refusing to train different code")
     if inventory(python) != manifest["environment"]:
         raise RuntimeError("Method Python/package inventory changed after submission")
+    if manifest.get("recovery_policy") is not None:
+        if sha256(Path(__file__).with_name("recovery_policy.py")) != manifest.get("recovery_helper_sha256"):
+            raise RuntimeError("Frozen recovery helper changed after submission")
+        helper = recovery_helper()
+        policy = helper.validate_policy(manifest["recovery_policy"], root)
+        if helper.policy_digest(policy) != manifest.get("recovery_policy_sha256"):
+            raise RuntimeError("Frozen recovery policy digest mismatch")
     mode = manifest.get("mode")
     if mode not in {"validation_only", "test"}:
         raise RuntimeError("Unexpected method evaluation mode")
@@ -637,6 +672,8 @@ def main(argv=None):
     parser.add_argument("--output-dir", default="results/method-pilot")
     parser.add_argument("--time", type=parse_walltime, default="03:00:00")
     parser.add_argument("--retry-failed", action="store_true", help="explicitly retry old unsuccessful tasks once")
+    parser.add_argument("--recovery-policy", type=Path,
+                        help="explicit audited Geolife source-compatibility policy; default remains strict")
     parser.add_argument("--evaluate-test", action="store_true", help="evaluate official test using fixed configurations")
     parser.add_argument("--watch", action="store_true", help="refill slots as tasks finish, without a whole-array barrier")
     parser.add_argument("--poll-seconds", type=positive_int, default=30)

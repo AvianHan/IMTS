@@ -224,9 +224,11 @@ def prepare_events(events: Sequence[EventSample], labels: np.ndarray,
     """Prepare event samples expressed in a common time-coordinate unit.
 
     The official non-test pool is split using the baseline neural wrapper's
-    sklearn 25% holdout and seed, with the same stratification fallback.  Labels
-    are encoded using inner training only.  If fallback leaves an unseen class
-    in validation/test, fail explicitly rather than repair using held-out data.
+    sklearn 25% holdout and seed, with the same stratification fallback.  The
+    inner-training label vocabulary is retained when complete.  Otherwise only
+    its vocabulary is expanded to the official non-test pool; no samples move
+    between partitions and no test labels define the vocabulary.  Feature
+    preprocessing and model fitting still use inner training only.
     """
     if isinstance(seed, bool) or not isinstance(seed, int) or not 0 <= seed < 2**32:
         raise ValueError("seed must be an integer in [0, 2**32).")
@@ -252,10 +254,13 @@ def prepare_events(events: Sequence[EventSample], labels: np.ndarray,
     encoder = LabelEncoder().fit(labels[train_indices])
     if len(encoder.classes_) < 2:
         raise ValueError("Inner training split has fewer than two classes.")
-    unseen = set(labels.tolist()) - set(encoder.classes_.tolist())
-    if unseen:
-        raise ValueError(f"Held-out labels absent from inner training: {unseen}. "
-                         "Refusing to move held-out samples or fit their labels.")
+    inner_classes = encoder.classes_.tolist()
+    missing_inner_classes = sorted(set(labels[fit_indices].tolist()) - set(inner_classes))
+    if missing_inner_classes:
+        # A rare class can land entirely in the unchanged validation holdout.
+        # Its output column is part of the task vocabulary, not a training
+        # example. _validate_split already rejects classes found only in test.
+        encoder = LabelEncoder().fit(labels[fit_indices])
     memory_estimate = _preparation_memory_estimate(events, n_channels, n_patches)
     if memory_estimate["estimated_peak_bytes"] > PREPARATION_MEMORY_BUDGET_BYTES:
         raise MemoryError(
@@ -332,6 +337,15 @@ def prepare_events(events: Sequence[EventSample], labels: np.ndarray,
             "time_ablation": "same shape, width, scaler, values and mask; standardized feature columns 7,8,9 zeroed",
         },
     }
+    if missing_inner_classes:
+        # Add provenance only for the newly supported case. Ordinary successful
+        # runs retain their previous metadata and numerical representation.
+        metadata["label_vocabulary"] = {
+            "source": "official non-test pool",
+            "inner_training_classes": inner_classes,
+            "classes_absent_from_inner_training": missing_inner_classes,
+            "policy": "vocabulary expansion only; no samples moved or dropped; test labels excluded; no positive inner-training examples for absent classes",
+        }
     return PreparedData(
         features[train_indices], features[val_indices], features[test_indices],
         encoder.transform(labels[train_indices]).astype(np.int64),

@@ -191,3 +191,48 @@ def test_config_and_protocol_cannot_disagree_even_if_each_hash_is_valid(folders)
     save(method, "record", record)
     with pytest.raises(ValueError, match="Configuration disagrees"):
         report.compare_results(*folders)
+
+
+def _recovery_record(seed=0, variant="history_state", *, legacy=False):
+    policy = json.loads((report.ROOT / "docs/geolife-recovery-policy.json").read_text())
+    value = method_record(seed=seed, variant=variant)
+    source = policy["legacy_source_sha256" if legacy else "corrected_source_sha256"]
+    value["environment"]["source_sha256"] = source
+    value["comparison_protocol"]["source_sha256"] = source
+    value["comparison_protocol_sha256"] = report._digest(value["comparison_protocol"])
+    return value
+
+
+def test_explicit_recovery_preserves_real_sources_and_default_is_strict(folders):
+    method, _ = folders
+    old = _recovery_record(legacy=True)
+    new = _recovery_record(variant="write_static")
+    save(method, "old", old)
+    save(method, "new", new)
+    with pytest.raises(ValueError, match="source versions"):
+        report.compare_results(*folders)
+    result = report.compare_results(*folders, recovery_policy=report.ROOT / "docs/geolife-recovery-policy.json")
+    assert {r["source_sha256"] for r in result["runs"]} == {
+        old["environment"]["source_sha256"], new["environment"]["source_sha256"]}
+    assert result["recovery_approval"]["kind"] == "geolife-label-vocabulary-v1"
+    assert json.loads((method / "old/result.json").read_text()) == old
+
+
+@pytest.mark.parametrize("change", ["unknown_source", "environment", "split", "legacy_geolife_seed0"])
+def test_recovery_does_not_relax_other_guards(folders, change):
+    method, _ = folders
+    save(method, "old", _recovery_record(legacy=True))
+    value = _recovery_record(variant="write_static")
+    if change == "unknown_source":
+        value["environment"]["source_sha256"] = "unknown"
+    elif change == "environment":
+        value["environment"]["packages"]["torch"] = "unknown"
+    elif change == "split":
+        value["comparison_protocol"]["sample_ids_sha256"]["test"] = "different"
+    else:
+        value = _recovery_record(variant="write_static", legacy=True)
+        value["dataset"] = "GeolifeSupervised"
+    value["comparison_protocol_sha256"] = report._digest(value["comparison_protocol"])
+    save(method, "new", value)
+    with pytest.raises(ValueError):
+        report.compare_results(*folders, recovery_policy=report.ROOT / "docs/geolife-recovery-policy.json")

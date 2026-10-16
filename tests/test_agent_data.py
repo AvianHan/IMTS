@@ -56,6 +56,82 @@ def test_validation_and_test_cannot_fit_width_scaler_or_training_features():
     assert p1["overflow_event_counts"]["test"] > 0
 
 
+def test_rare_class_in_validation_expands_only_vocabulary_and_preserves_split():
+    events, labels, split, ids = example()
+    labels[1] = "c"  # A singleton prevents sklearn's stratified holdout.
+    data = prepare_events(events, labels, split, ids, 2, seed=0)
+    expected = {"train": [13, 4, 2, 14, 10, 7, 15, 11, 3, 0, 5, 12],
+                "val": [1, 6, 8, 9], "test": [16, 17, 18, 19]}
+    assert data.metadata["source_indices"] == expected
+    assert data.metadata["sample_ids"] == {
+        name: ids[index].tolist() for name, index in expected.items()
+    }
+    assert data.metadata["validation_stratified"] is False
+    assert data.classes.tolist() == ["a", "b", "c"]
+    assert set(data.y_train) == {0, 1}
+    assert data.y_val.tolist() == [2, 0, 0, 1]
+    assert data.metadata["label_vocabulary"] == {
+        "source": "official non-test pool",
+        "inner_training_classes": ["a", "b"],
+        "classes_absent_from_inner_training": ["c"],
+        "policy": "vocabulary expansion only; no samples moved or dropped; test labels excluded; no positive inner-training examples for absent classes",
+    }
+
+
+def test_vocabulary_expansion_does_not_admit_test_only_classes():
+    events, labels, split, ids = example()
+    labels[1], labels[16] = "c", "d"
+    with pytest.raises(ValueError, match="Test labels absent from the fitting split"):
+        prepare_events(events, labels, split, ids, 2, seed=0)
+
+
+def test_vocabulary_expansion_does_not_relax_inner_training_class_requirement():
+    events, labels, split, ids = example()
+    labels[:] = "a"
+    labels[1] = "b"  # Seed 0 places the sole b in validation.
+    with pytest.raises(ValueError, match="Inner training split has fewer than two classes"):
+        prepare_events(events, labels, split, ids, 2, seed=0)
+
+
+def test_complete_inner_vocabulary_keeps_original_encoding_path_and_metadata(monkeypatch):
+    events, labels, split, ids = example()
+    fitted_labels = []
+    original_encoder = data_module.LabelEncoder
+
+    class TrackingEncoder(original_encoder):
+        def fit(self, labels):
+            fitted_labels.append(np.asarray(labels).copy())
+            return super().fit(labels)
+
+    monkeypatch.setattr(data_module, "LabelEncoder", TrackingEncoder)
+    data = prepare_events(events, labels, split, ids, 2, seed=0)
+    train = data.metadata["source_indices"]["train"]
+    assert len(fitted_labels) == 1
+    np.testing.assert_array_equal(fitted_labels[0], labels[train])
+    assert "label_vocabulary" not in data.metadata
+    assert data.metadata["classes"] == ["a", "b"]
+    assert data.metadata["class_mapping"] == [{"label": "a", "index": 0},
+                                               {"label": "b", "index": 1}]
+
+
+def test_rare_validation_class_does_not_fit_feature_preprocessing():
+    events, labels, split, ids = example()
+    labels[1] = "c"
+    original = prepare_events(events, labels, split, ids, 2, seed=0)
+    heldout = original.metadata["source_indices"]["val"] + original.metadata["source_indices"]["test"]
+    for i in heldout:
+        t, c, v = events[i]
+        events[i] = t * 1000., c, v * 10000.
+    changed = prepare_events(events, labels, split, ids, 2, seed=0)
+    p0, p1 = original.metadata["preprocessing"], changed.metadata["preprocessing"]
+    for key in ("patch_width_time_units", "raw_value_center_by_channel",
+                "raw_value_scale_by_channel", "feature_center", "feature_scale"):
+        assert p0[key] == p1[key]
+    np.testing.assert_array_equal(original.X_train, changed.X_train)
+    np.testing.assert_array_equal(original.y_train, changed.y_train)
+    assert original.metadata["source_indices"] == changed.metadata["source_indices"]
+
+
 def test_time_ablation_preserves_dimensions_masks_and_value_features():
     events, labels, split, ids = example()
     full = prepare_events(events, labels, split, ids, 2)

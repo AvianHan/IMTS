@@ -35,6 +35,7 @@ def parser():
     comparison.add_argument("--method-root", default="results/method-ablation-full")
     comparison.add_argument("--baseline-root", required=True, help="Baseline result directory, e.g. ../IMTS/results/jv-first-full")
     comparison.add_argument("--output", help="Write aggregate CSV with explicit missing/partial coverage")
+    comparison.add_argument("--recovery-policy", help="Explicit audited Geolife source-compatibility policy")
     return root
 
 

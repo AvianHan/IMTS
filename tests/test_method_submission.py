@@ -533,3 +533,59 @@ def test_plan_lock_rejects_second_watcher(pilot):
         with pytest.raises(RuntimeError, match="already active"):
             with submit.plan_lock(root):
                 pytest.fail("second watch acquired lock")
+
+
+def test_recovery_reuses_verified_old_success_and_preserves_environment_guard(tmp_path):
+    policy = json.loads((SCRIPT.parents[1] / "docs/geolife-recovery-policy.json").read_text())
+    task = {"dataset": "JapaneseVowels", "variant": "history_state", "seed": 0}
+    old = {"source_sha256": policy["legacy_source_sha256"], "environment": {"python": "3.11", "packages": {}}}
+    path, record = valid_record(tmp_path, task, old, mode="test")
+    snap = {**old, "source_sha256": policy["corrected_source_sha256"]}
+    assert not submit.valid_success(path, task, "test", snap)
+    snap["recovery_policy"] = policy
+    assert submit.valid_success(path, task, "test", snap)
+    record["environment"]["packages"] = {"torch": "changed"}
+    path.write_text(json.dumps(record))
+    assert not submit.valid_success(path, task, "test", snap)
+    assert not submit.compatible_source({"environment": {"source_sha256": "unknown"}}, task, snap)
+    assert not submit.compatible_source({"environment": {"source_sha256": old["source_sha256"]}},
+                                        {**task, "dataset": "GeolifeSupervised"}, snap)
+
+
+def test_recovery_plan_skips_500_successes_and_submits_only_40(pilot, monkeypatch):
+    root, args, _ = pilot
+    args.retry_failed = True
+    tasks = [{"dataset": f"dataset-{i // 30}", "variant": f"variant-{i % 10}", "seed": i % 3}
+             for i in range(540)]
+    successful = {submit.execution_key(task, "test"): "verified.json" for task in tasks[:500]}
+    assert len(successful) == 500
+    monkeypatch.setattr(submit, "successful_results", lambda *_: successful)
+    monkeypatch.setattr(submit, "ledger_status", lambda *_: ({}, set(), 0))
+    submitted = []
+    monkeypatch.setattr(submit, "submit_batch", lambda _a, _r, chunk, *_: submitted.extend(chunk))
+    submit.phase(args, root, tasks, "test", snapshot(root), {"effective_submit_cap": 60})
+    assert submitted == tasks[500:]
+
+
+def test_recovery_submission_freezes_helper_and_policy(pilot, monkeypatch):
+    root, args, tasks = pilot
+    policy = json.loads((SCRIPT.parents[1] / "docs/geolife-recovery-policy.json").read_text())
+    snap = {**snapshot(root), "recovery_policy": policy,
+            "recovery_policy_sha256": submit.recovery_helper().policy_digest(policy)}
+    monkeypatch.setattr(submit.subprocess, "run", lambda *a, **kw: result("991\n"))
+    _, folder = submit.submit_batch(args, root, tasks, "test", set(), {"effective_submit_cap": 60}, snap)
+    manifest = json.loads((folder / "manifest.json").read_text())
+    assert manifest["recovery_policy"] == policy
+    assert manifest["recovery_helper_sha256"] == submit.sha256(folder / "recovery_policy.py")
+    assert (folder / "recovery_policy.py").read_bytes() == SCRIPT.with_name("recovery_policy.py").read_bytes()
+
+
+def test_worker_rejects_changed_frozen_recovery_helper_before_reuse(pilot, monkeypatch):
+    root, _, tasks = pilot
+    path, manifest = worker_manifest(root, tasks[0])
+    manifest["recovery_policy"] = {"kind": "geolife-label-vocabulary-v1"}
+    manifest["recovery_helper_sha256"] = "wrong"
+    path.write_text(json.dumps(manifest))
+    monkeypatch.setattr(submit, "successful_results", lambda *_: pytest.fail("must stop before reuse"))
+    with pytest.raises(RuntimeError, match="Frozen recovery helper changed"):
+        submit.worker(argparse.Namespace(worker=str(path), manifest_sha256=submit.sha256(path)))

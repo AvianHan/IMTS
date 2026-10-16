@@ -8,6 +8,7 @@ from __future__ import annotations
 from collections import Counter
 import csv
 import hashlib
+import importlib.util
 import json
 import math
 from pathlib import Path
@@ -60,7 +61,7 @@ def _settings_without_seed(value):
     return value
 
 
-def compare_results(method_root, baseline_root, output=None):
+def compare_results(method_root, baseline_root, output=None, recovery_policy=None):
     """Return JSON-safe coverage, dataset rows and per-run runtime/provenance.
 
     ``output`` optionally creates a new aggregate CSV (never overwrites one).
@@ -69,6 +70,12 @@ def compare_results(method_root, baseline_root, output=None):
     dataset/seed-specific protocols must agree for the same dataset and seed.
     Hardware differences are recorded rather than silently treated as equal cost.
     """
+    policy = helper = None
+    if recovery_policy is not None:
+        spec = importlib.util.spec_from_file_location("imts_report_recovery", ROOT / "scripts/recovery_policy.py")
+        helper = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(helper)
+        policy = helper.load_policy(recovery_policy, ROOT)
     datasets_config = json.loads((ROOT / "configs/datasets.json").read_text())
     baseline_config = json.loads((ROOT / "configs/baselines.json").read_text())
     datasets = {item["name"]: item for item in datasets_config["datasets"]}
@@ -124,7 +131,12 @@ def compare_results(method_root, baseline_root, output=None):
             source = env.get("source_sha256")
             if not source:
                 raise ValueError(f"Missing source provenance in {path}")
-            _require_same(signatures, (family, "source"), source, "source versions")
+            comparable_source = source
+            if family == "method" and policy is not None:
+                if not helper.source_allowed(policy, source, dataset, seed):
+                    raise ValueError(f"Source/task is not approved by the recovery policy: {path}")
+                comparable_source = policy["corrected_source_sha256"]
+            _require_same(signatures, (family, "source"), comparable_source, "source versions")
             packages = _packages(env)
             _require_same(signatures, (family, "environment", model if family == "baseline" else "all"),
                           {"packages": packages, "python": env.get("python")}, "software environments")
@@ -153,6 +165,8 @@ def compare_results(method_root, baseline_root, output=None):
                     raise ValueError(f"Comparison protocol is not an official test evaluation in {path}")
                 comparable_protocol = {key: value for key, value in protocol.items()
                                        if key not in _HARDWARE_CONFIG | {"evaluate_test"}}
+                if policy is not None:
+                    comparable_protocol["source_sha256"] = comparable_source
                 _require_same(signatures, (family, "protocol", dataset, seed), comparable_protocol,
                               "data splits/preprocessing/protocols")
                 if not record.get("variant_spec"):
@@ -220,6 +234,9 @@ def compare_results(method_root, baseline_root, output=None):
                       "No failed score is imputed as zero. Standard deviation uses ddof=1; one-seed std is unavailable. "
                       "Method and baseline implementations/environments may differ; runtime is descriptive and hardware is retained. "
                       "No cross-dataset ranking or automatic best-variant selection is performed."}
+    if policy is not None:
+        report["recovery_approval"] = helper.summary(policy)
+        report["note"] += " Explicit audited Geolife vocabulary recovery approval applied; actual per-run source hashes are retained."
     if output is not None:
         output = Path(output)
         output.parent.mkdir(parents=True, exist_ok=True)

@@ -82,7 +82,8 @@ def test_real_launcher_freezes_new_worker_but_baseline_training_and_guards(basel
     before = launcher.source_digest(baseline)
     wrapper.main(["--baseline-root", str(baseline), "--submit", "--datasets", "JapaneseVowels",
                   "--cpu-batch-size", "1", "--gpu-batch-size", "1", "--total-batch-size", "2",
-                  "--max-user-jobs", "60", "--gpu-time", "03:00:00"])
+                  "--max-user-jobs", "60", "--gpu-time", "03:00:00",
+                  "--cpu-mem", "128G", "--gpu-mem", "96G"])
     folder = next((baseline / "results/accounting/batches").iterdir())
     manifest_path = folder / "manifest.json"
     manifest = json.loads(manifest_path.read_text())
@@ -95,6 +96,9 @@ def test_real_launcher_freezes_new_worker_but_baseline_training_and_guards(basel
     assert (folder / "worker.py").read_bytes() == (REPO / "scripts/submit_benchmarks.py").read_bytes()
     assert Path(manifest["templates"]["gpu"]["path"]).read_bytes() == (baseline / "slurm/benchmark_gpu.sbatch").read_bytes()
     assert "--time=03:00:00" in calls[1]
+    assert "--mem=128G" in calls[0] and "--mem=96G" in calls[1]
+    assert manifest["resources"]["cpu"]["mem"] == "128G"
+    assert manifest["resources"]["gpu"]["mem"] == "96G"
 
     # A changed baseline source must be rejected even though the scheduling script
     # and its default ROOT came from a different checkout.

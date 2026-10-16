@@ -322,6 +322,15 @@ def submit(args, root, output, ledger, tasks, source, env, datasets, revision, s
 
 
 def _submit_locked(args, root, output, ledger, tasks, source, env, datasets, revision, skipped):
+    template_contents = {group: template_text(root, group) for group in ("cpu", "gpu")}
+    memory_overrides, effective_memory = {}, {}
+    for group, content in template_contents.items():
+        requested = getattr(args, f"{group}_mem", None)
+        memory_overrides[group] = memory_limit(requested) if requested is not None else None
+        default_memory = re.findall(r"^#SBATCH\s+--mem(?:=|\s+)(\S+)\s*$", content, re.M)
+        if len(default_memory) != 1:
+            raise RuntimeError(f"Expected exactly one --mem directive in the {group} template")
+        effective_memory[group] = memory_overrides[group] or memory_limit(default_memory[0])
     batch_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex[:8]
     folder = ledger / batch_id
     folder.mkdir(parents=True)
@@ -333,7 +342,7 @@ def _submit_locked(args, root, output, ledger, tasks, source, env, datasets, rev
     templates = {}
     for group in groups:
         path = folder / f"{group}.template.sbatch"
-        path.write_text(template_text(root, group))
+        path.write_text(template_contents[group])
         templates[group] = {"path": str(path), "sha256": digest(path)}
     manifest = {
         "schema_version": 1, "batch_id": batch_id,
@@ -345,6 +354,8 @@ def _submit_locked(args, root, output, ledger, tasks, source, env, datasets, rev
         "max_dense_gib": args.max_dense_gib,
         "resources": {group: {"concurrency": getattr(args, f"{group}_concurrency"),
                               "time_limit": getattr(args, f"{group}_time"),
+                              "mem": effective_memory[group],
+                              "mem_source": "command line" if memory_overrides[group] else "template",
                               "cpus_per_task": 4} for group in groups},
     }
     manifest_path = folder / "manifest.json"
@@ -372,8 +383,10 @@ def _submit_locked(args, root, output, ledger, tasks, source, env, datasets, rev
         job_name = f"imts-{group}-{batch_id}"
         request = ["sbatch", "--parsable", "--export=ALL", "--no-requeue", f"--chdir={root}", f"--job-name={job_name}",
                    f"--array=0-{len(group_tasks) - 1}%{getattr(args, group + '_concurrency')}",
-                   f"--time={getattr(args, group + '_time')}",
-                   f"--output={folder}/slurm-%A_%a.out", str(wrapper)]
+                   f"--time={getattr(args, group + '_time')}"]
+        if memory_overrides[group] is not None:
+            request.append(f"--mem={memory_overrides[group]}")
+        request.extend([f"--output={folder}/slurm-%A_%a.out", str(wrapper)])
         write_new(folder / f"{group}.intent.json", {
             "command": request, "job_name": job_name, "manifest_sha256": manifest_hash,
         })
@@ -552,6 +565,13 @@ def time_limit(value):
     return value
 
 
+def memory_limit(value):
+    """Positive Slurm --mem amount; unsuffixed values are MiB, never all memory."""
+    if not isinstance(value, str) or not re.fullmatch(r"[1-9][0-9]*[KMGTkmgt]?", value):
+        raise argparse.ArgumentTypeError("use a positive integer with optional K/M/G/T suffix, e.g. 128G")
+    return value.upper()
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--submit", action="store_true", help="actually submit; default is a read-only dry run")
@@ -573,6 +593,10 @@ def main():
                         help="optional user-wide queued/running job cap, checked under a shared submission lock")
     parser.add_argument("--cpu-time", type=time_limit, default="02:00:00")
     parser.add_argument("--gpu-time", type=time_limit, default="01:00:00")
+    parser.add_argument("--cpu-mem", type=memory_limit,
+                        help="override per-node CPU-job memory, e.g. 128G; default uses the baseline template")
+    parser.add_argument("--gpu-mem", type=memory_limit,
+                        help="override per-node GPU-job memory, e.g. 128G; default uses the baseline template")
     parser.add_argument("--max-dense-gib", type=float, default=8.0)
     parser.add_argument("--worker", help=argparse.SUPPRESS)
     parser.add_argument("--manifest-sha256", help=argparse.SUPPRESS)
@@ -619,6 +643,9 @@ def main():
         print(f"Deferred: {len(pending) - len(batch)}", flush=True)
         print(f"Concurrency: CPU {args.cpu_concurrency}, GPU {args.gpu_concurrency}; "
               f"time limits: {args.cpu_time}, {args.gpu_time}; dense-load guard: {args.max_dense_gib:g} GiB", flush=True)
+        if args.cpu_mem is not None or args.gpu_mem is not None:
+            print(f"Memory requests: CPU {args.cpu_mem or 'baseline template'}, "
+                  f"GPU {args.gpu_mem or 'baseline template'} per node", flush=True)
         print(f"Results: {output}", flush=True)
         if not pending:
             print("All selected tasks already succeeded. No jobs submitted.", flush=True)

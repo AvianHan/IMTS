@@ -505,6 +505,54 @@ def test_partial_submission_keeps_receipts_and_does_not_retry(experiment, monkey
         assert checked.returncode == 0, checked.stderr
 
 
+@pytest.mark.parametrize("overrides,expected", [
+    ({}, {"cpu": "32G", "gpu": "32G"}),
+    ({"cpu_mem": "128g", "gpu_mem": "96G"}, {"cpu": "128G", "gpu": "96G"}),
+    ({"gpu_mem": "65536"}, {"cpu": "32G", "gpu": "65536"}),
+])
+def test_memory_requests_match_manifest_and_preserve_templates(experiment, monkeypatch, overrides, expected):
+    exp = experiment
+    calls = []
+    monkeypatch.setenv("SBATCH_MEM_PER_NODE", "999G")
+
+    def submit(command, **kwargs):
+        assert "SBATCH_MEM_PER_NODE" not in kwargs["env"]
+        calls.append(command)
+        return subprocess.CompletedProcess(command, 0, f"{6000 + len(calls)}\n", "")
+
+    monkeypatch.setattr(launcher.subprocess, "run", submit)
+    folder, _ = launcher.submit(submit_arguments(**overrides), exp.root, exp.output, exp.ledger,
+                                [task(), task("BRITS")], exp.source, ENVIRONMENT,
+                                exp.datasets, exp.revision, {})
+    manifest = launcher.read_json(folder / "manifest.json")
+    for group, command in zip(("cpu", "gpu"), calls):
+        requested = overrides.get(f"{group}_mem")
+        resource = manifest["resources"][group]
+        assert resource["mem"] == expected[group]
+        assert resource["mem_source"] == ("command line" if requested else "template")
+        actual_flags = [value for value in command if value.startswith("--mem=")]
+        assert actual_flags == ([f"--mem={expected[group]}"] if requested else [])
+        assert launcher.read_json(folder / f"{group}.intent.json")["command"] == command
+        assert (folder / f"{group}.template.sbatch").read_bytes() == (
+            exp.root / "slurm" / f"benchmark_{group}.sbatch"
+        ).read_bytes()
+        assert "#SBATCH --mem=32G\n" in (folder / f"{group}.sbatch").read_text()
+
+
+@pytest.mark.parametrize("option", ["--cpu-mem", "--gpu-mem"])
+@pytest.mark.parametrize("value", ["0", "0G", "-1G", "1.5G", "128GB", "128G --qos=other", "", "unlimited"])
+def test_invalid_memory_is_rejected_before_any_query_or_submission(monkeypatch, option, value):
+    monkeypatch.setattr(sys, "argv", ["submit_benchmarks.py", f"{option}={value}", "--submit"])
+
+    def unexpected(*args, **kwargs):
+        pytest.fail("Invalid memory reached an external command")
+
+    monkeypatch.setattr(launcher.subprocess, "run", unexpected)
+    with pytest.raises(SystemExit) as error:
+        launcher.main()
+    assert error.value.code == 2
+
+
 def test_new_qos_refusal_records_rejection_and_stops_before_gpu(experiment, monkeypatch):
     exp = experiment
     calls = []
